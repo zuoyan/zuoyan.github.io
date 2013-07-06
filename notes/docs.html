@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>notes on docs</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="title" content="notes on docs"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2013-07-07T01:08+0800"/>
+<meta name="author" content="Changsheng Jiang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+
+<link rel="stylesheet" href="../css/weizi.css" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+    MathJax.Hub.Register.StartupHook(
+       "HTML-CSS Jax Ready", function () {
+           MathJax.OutputJax["HTML-CSS"].Font.checkWebFont = function (check,font,callback) {
+              callback(check.STATUS.OK);
+            };
+    });
+    MathJax.Hub.Configured();
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up" style="text-align:right;font-size:70%;white-space:nowrap;">
+ <a accesskey="h" href="./"> UP </a>
+ |
+ <a accesskey="H" href="../"> HOME </a>
+</div>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">notes on docs</h1>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 LSI</a></li>
+<li><a href="#sec-2">2 SGD algorithm</a>
+<ul>
+<li><a href="#sec-2-1">2.1 Kalman Algorithms</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3 Topics Model</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> LSI</h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+  <a href="http://en.wikipedia.org/wiki/Latent_semantic_indexing">http://en.wikipedia.org/wiki/Latent_semantic_indexing</a>
+</p>
+<p>
+Term Document Matrix \(A\), term in rows, document in columns.
+</p>
+<p>
+Let \(l_{ij}\) denote the relative frequency of term \(i\) in document
+\(j\), and \(g_i\) describes the relative frequency of term \(i\) in the
+corpus. \(a_{ij}\) can be set by \(a_{ij} = l_{ij} g_i\).
+</p>
+<p>
+\(l_{ij}\) may be defined by:
+</p>
+<dl>
+<dt>Binary</dt><dd>
+
+<p>
+   \(l_{ij} = 1\) if term \(i\) exists in document \(j\)
+</p>
+</dd>
+<dt>Term Frequency</dt><dd>
+
+<p>
+   \(l_{ij}= \mathrm{tf}_{ij}\), number of occurrences of term \(i\) in document
+   \(j\).
+</p>
+</dd>
+<dt>Log TF</dt><dd>
+
+<p>
+   \(l_{ij} = \log(\mathrm{tf}_{ij} + 1)\)
+</p>
+</dd>
+<dt>Augnorm</dt><dd>
+
+<p>
+   \(l_{ij} = \dfrac{\dfrac{\mathrm{tf}_{ij}}{\max_i{\mathrm{tf}_{ij}}} + 1}{2}\)
+</p></dd>
+</dl>
+
+
+<p>
+And \(g_i\) may be define by:
+</p>
+<dl>
+<dt>Binary</dt><dd>\(g_i\) = 1
+
+</dd>
+<dt>Normal</dt><dd>\(g_i\) = \(\dfrac{1}{\sum_j \mathrm{tf}_{ij}^2}\)
+
+</dd>
+<dt>GfIdf</dt><dd>\(g_i = \dfrac{\mathrm{gf}_i}{\mathrm{df}_i}\), where
+             \(\mathrm{gf}_i\) is the total times of \(i\) in the corpus,
+             and \(\mathrm{df}_i\) is the number document containing \(i\)
+
+</dd>
+<dt>Idf</dt><dd>\(g_i = \log_2\dfrac{n}{1 + \mathrm{df}_i}\), \(n\) is the
+           number of all terms.
+
+</dd>
+<dt>Entropy</dt><dd>\(g_i = 1 + \sum_j\dfrac{p_{ij}\log p_{ij}}{\log n}\),
+               where \(p_{ij} = \dfrac{\mathrm{tf}_{ij}}{\mathrm{gf}_{ij}}\).
+</dd>
+</dl>
+
+
+<p>
+Let \(A_k = U_k S_k V_k'\) be the truncated k SVD of \(A\).
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> SGD algorithm</h2>
+<div class="outline-text-2" id="text-2">
+
+
+<p>
+Stochastic Learning
+</p>
+<p>
+<a href="http://en.wikipedia.org/wiki/Stochastic_gradient_descent">http://en.wikipedia.org/wiki/Stochastic_gradient_descent</a>
+<a href="http://leon.bottou.org/projects/sgd">http://leon.bottou.org/projects/sgd</a>
+</p>
+<p>
+Expected Risk Function
+</p>
+
+
+$$C(w) \triangleq E_z Q(z, w) \triangleq \int Q(z, w) d P(z).$$
+
+<p>
+Empirical Risk $$\hat{C_L}(w) \triangleq \dfrac1L\sum_{n=1}^{L} Q(z_n, w).$$
+</p>
+<p>
+Batch Gradient Descent
+</p>
+
+
+\begin{align}
+w_{t+1} &= w_t - \gamma_t\nabla_w \hat{C_L}(w_t) \\
+&= w_t - \gamma_t\nabla_w\dfrac1L\sum_{n=1}^L\nabla_wQ(z_n, w_t). \\
+\end{align}
+
+<p>
+Online Gradient Descent $$w_{t+1} = w_t - \gamma_t\nabla_wQ(z_t, w_t).$$
+</p>
+<p>
+Convergce decreasing learning rates $$\sum \gamma_t^2 \le \infty.$$
+</p>
+<p>
+Non locality $$\sum\gamma_t = \infty.$$
+</p>
+
+</div>
+
+<div id="outline-container-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Kalman Algorithms</h3>
+<div class="outline-text-3" id="text-2-1">
+
+
+
+
+$$C(w) = \int Q(z, w) d P(z) \;\text{with}\; Q(z, w) \triangleq (y - w'x)^2.$$
+
+$$w_{t+1} = w_t - \dfrac1t H_t^{-1}\nabla_wQ(z_t, w_t)$$
+
+\(H_t\) denotes Hessian of an empirical estimate \(C_t(w)\).
+
+$$C_t(w) \triangleq \dfrac12\dfrac1t \sum_{i=1}^tQ(z_i, w).$$
+
+<p>
+then $$H_t \triangleq \nabla_w^2 C_t(w) = \dfrac1t \sum_{i=1}^t x_ix_i'.$$
+</p>
+<p>
+\(K_t \triangleq \dfrac1{t-1}H_{t-1}^{-1}\), then \(K_{t+1} = K_t - \dfrac{ (K_tx_t)(K_tx_t)'}{1 + x_t'K_tx_t}\), and
+</p>
+
+
+$$w_{t+1} = w_t - K_{t+1}(y_t - w_t'x_t)'x_t.$$
+
+<p>
+It's a SGD algorithms with gradient step $$\alpha_t = | H_t^{-1} | =
+\dfrac{1}{\lambda_{min} H_t}.$$　
+</p>
+<p>
+In this way, we get second-order convergence.
+</p></div>
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Topics Model</h2>
+<div class="outline-text-2" id="text-3">
+
+
+<p>
+(Hofmann, 1999) A simplex of dim. \(W-1\) represent the all probability
+distributions over \(W\) words.  Each document in the collection can be
+represented as a point on the simplex. Each topic can also be
+represented as point, too.  Each document that is generated by the
+model is a convex combination of the \(T\) topics. The document is also
+a point of simplex of dim \(T-1\) spanned by \(T\) topics. When \(T &lt;&lt; W\),
+this can thought of as a dim. reduction.
+</p></div>
+</div>
+</div>
+
+<div id="postamble">
+<div style='clear:both;margin-top:20px'></div><hr /><div style='float:right;font-size:1.2em'><a href='mailto:changsheng@weizi.org'>Changsheng Jiang</a></div><div style='clear:both'></div>
+</div>
+</body>
+</html>

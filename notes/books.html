@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+lang="en" xml:lang="en">
+<head>
+<title>notes on books</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2011-08-02 19:49:41 CST"/>
+<meta name="author" content="Changsheng Jiang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+
+<link rel="stylesheet" href="../css/weizi.css" type="text/css" />
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/javascript" src="http://orgmode.org/mathjax/MathJax.js">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<div id="org-div-home-and-up" style="text-align:right;font-size:70%;white-space:nowrap;">
+ <a accesskey="h" href="./"> UP </a>
+ |
+ <a accesskey="H" href="../"> HOME </a>
+</div>
+
+<h1 class="title">notes on books</h1>
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Statistical Models, Theory and Practise </a>
+<ul>
+<li><a href="#sec-1-1">1.1 P14 </a></li>
+<li><a href="#sec-1-2">1.2 P118 </a></li>
+</ul>
+</li>
+<li><a href="#sec-2">2 最优化理论与方法 </a>
+<ul>
+<li><a href="#sec-2-1">2.1 P12 </a>
+<ul>
+<li><a href="#sec-2-1-1">2.1.1 Sherman-Morrison 定理 </a></li>
+<li><a href="#sec-2-1-2">2.1.2 Sherman-Morrison-Woodbury 定理 </a></li>
+</ul>
+</li>
+<li><a href="#sec-2-2">2.2 P117 </a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3 Numerical Optimization </a>
+<ul>
+<li><a href="#sec-3-1">3.1 Wolfe Conditions </a></li>
+<li><a href="#sec-3-2">3.2 Zoutendijk's theorem </a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Statistical Models, Theory and Practise </h2>
+<div class="outline-text-2" id="text-1">
+
+
+
+</div>
+
+<div id="outline-container-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> P14 </h3>
+<div class="outline-text-3" id="text-1-1">
+
+
+<p>
+书中习题 14 提到
+</p>
+<p>
+the slope of the regression line for predicting y from x is
+cov(x, y) / var(x).
+</p>
+<p>
+对于多变量, 应该有类似的, 只是会涉及到矩阵逆, 就不好用了.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> P118 </h3>
+<div class="outline-text-3" id="text-1-2">
+
+
+<p>
+在大部分情况下(书中未给出), MLE 估计值 \(\hat\theta\) 是真实值
+\(\theta_0\) 的一个渐近正态估计, 即, \(E(\theta) = \theta_0\).
+</p>
+<p>
+方差有三种计算方式
+</p>
+
+
+$$var(\hat\theta) = \dfrac{I_{\theta_0}^{-1}}{n} = \dfrac{I_{\hat\theta}^{-1}}{n} = \left(-L''_n(\hat\theta)\right)^{-1}.$$
+
+<p>
+其中, \(I_\theta = -E_\theta(L''_1(\theta))\) 为 Fisher Information.
+</p>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> 最优化理论与方法 </h2>
+<div class="outline-text-2" id="text-2">
+
+
+
+</div>
+
+<div id="outline-container-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> P12 </h3>
+<div class="outline-text-3" id="text-2-1">
+
+
+<p>
+秩一校正
+</p>
+
+</div>
+
+<div id="outline-container-2-1-1" class="outline-4">
+<h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> Sherman-Morrison 定理 </h4>
+<div class="outline-text-4" id="text-2-1-1">
+
+
+<p>
+设 \(A\in R^{n\times n}\) 是非奇异矩阵, \(u, v\in R^n\) 是任意向量, 若 $
+1 + v^T A<sup>-1</sup> u &ne; 0 $, 则有
+</p>
+
+
+$$(A+uv^T)^{-1} = A^{-1} - \dfrac{A^{-1}uv^TA^{-1}}{1+v^TA^{-1}u}.$$
+
+</div>
+
+</div>
+
+<div id="outline-container-2-1-2" class="outline-4">
+<h4 id="sec-2-1-2"><span class="section-number-4">2.1.2</span> Sherman-Morrison-Woodbury 定理 </h4>
+<div class="outline-text-4" id="text-2-1-2">
+
+
+<p>
+设 \(A\) 是 \(n\times n\) 的非奇异矩阵, \(U,V\) 是 \(n\times m\) 的矩阵, 若
+\(I + V^*A^{-1}U\) 可逆, 则有
+</p>
+
+
+$$(A + UV^*)^{-1} = A^{-1} - A^{-1}U(I + V^*A^{-1}U)^{-1}V^*A^{-1}.$$
+
+<p>
+这两个定理的证明是简单的计算, 困难的是, 如何推导出此公式, 而不仅是验证.
+</p>
+<p>
+从 Sherman-Morrison-Woodbury 定理左边提出因子 \(A^{-1}\), 并用 \(U\) 代替
+\(A^{-1}U\), 则化成仅需要证明
+</p>
+
+
+$$(I + UV^*)^{-1} = I - U(I + V^*U)^{-1}V^*.$$
+
+<p>
+使用级数展开
+</p>
+
+
+$$(I - X)^{-1} = I + \sum_{i=1}^{\infty} X^i$$
+
+<p>
+即可.
+</p>
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <span class="todo TODO"> TODO</span> P117 </h3>
+<div class="outline-text-3" id="text-2-2">
+
+
+<p>
+两点步长梯度法
+</p>
+<p>
+Barzilai 和 Borwein 1988 年提取两点步长梯度法.
+</p>
+<p>
+除初始步长外, 其他步长为
+</p>
+
+
+$$\alpha_k = \dfrac{s_{k-1}^Ty_{k-1}}{{\Vert y_{k-1}\Vert}^2},$$
+
+<p>
+或
+</p>
+
+
+$$\alpha_k = \dfrac{{\Vert s_{k-1}\Vert}^2}{s_{k-1}^Ty_{k-1}}.$$
+
+<p>
+其中, \(s_{k-1} = x_k - x_{k-1}\), \(y_{k-1} = g_k - g_{k-1}\).
+</p>
+<p>
+确定步长很烦的, 不知道这方法适用范围如何.
+</p>
+
+
+</div>
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Numerical Optimization </h2>
+<div class="outline-text-2" id="text-3">
+
+
+
+</div>
+
+<div id="outline-container-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Wolfe Conditions </h3>
+<div class="outline-text-3" id="text-3-1">
+
+
+<p>
+   Page 33.
+</p>
+<p>
+   Sufficient decrease condition
+</p>
+<p>
+   $$f(x_k + \alpha p_k) \leq f(x_k) + c_1\alpha\nabla f_k^Tp_k.$$
+</p>
+<p>
+   Also called as <b>Armijo condition</b>. In practise, \(c_1\) is chosen to
+   be quite small, saying, \(c_1 = 10^{-4}\).
+</p>
+<p>
+   Curvature condition
+</p>
+<p>
+   $$\nabla f(x_k + \alpha_kp_k)^Tp_k \geq c_2 \nabla f_k^T p_k.$$
+</p>
+<p>
+   Where \(c_2 \in (c_1, 1)\).
+</p>
+<p>
+   Strong Wolfe conditions:
+</p>
+<p>
+   $$f(x_k + \alpha p_k) \leq f(x_k) + c_1\alpha\nabla f_k^Tp_k.$$
+</p>
+<p>
+   $$\vert\nabla f(x_k + \alpha_kp_k)^Tp_k\vert \leq c_2 \vert\nabla f_k^T p_k\vert.$$
+</p>
+<p>
+   <b>Existence Lemma</b>: If \(f\in C^1(\mathbb{R}^n, \mathbb{R})\), and \(f\) is bounded and descent
+   along the way \(x_k + \alpha p_k\), \(\alpha &gt; 0\), then, there exist
+   intervals satisfying the Wolfe conditions and the strong wolfe
+   conditions.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Zoutendijk's theorem </h3>
+<div class="outline-text-3" id="text-3-2">
+
+
+<p>
+   Page 38
+</p>
+<p>
+   Consider any iteration of the form \(x_{k+1} = x_k + \alpha_k p_k\),
+   where \(p_k\) is a descent direction and \(\alpha_k\) satisfies the
+   Wolfe conditions. Suppose that \(f\) is bounded below in
+   \(\mathbb{R}^n\) and that \(f\) is continuously differentiable in an
+   open set \(\mathcal{N}\) containg the level set \(\{x : f(x) \leq
+   f(x_0)\}\), where \(x_0\) is the starting point of the
+   iteration. Assume also that gradient \(\nabla f\) is Lipschitz
+   continuous on \(\mathcal{N}\), then,
+</p>
+<p>
+   $$\sum_{k\geq 0} \cos^2\theta_k \Vert \nabla f_k \Vert^2 &lt;
+   \infty.$$
+
+   This theorem can be used to prove the convergence of numerical
+   algorithm. According this theorem, any directions not too
+   perpendicular to the gradient(in limit sense) are acceptable.
+</p>
+<p>
+   Considering the Newton method, does this theorem can give a hint of
+   the limit of angle of \(G^{-1}(x)x\), and \(g(x)\)?
+</p>
+
+</div>
+</div>
+</div>
+<div id="postamble">
+<div style='clear:both;margin-top:20px'></div><hr /><div style='float:right;font-size:1.2em'><a href='mailto:changsheng@weizi.org'>Changsheng Jiang</a></div><div style='clear:both'></div></div>
+</div>
+</body>
+</html>
