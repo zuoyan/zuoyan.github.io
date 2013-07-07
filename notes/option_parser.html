@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="title" content="Command Line Options Parser for C++, a state monad approach"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2013-07-07T21:10+0800"/>
+<meta name="generated" content="2013-07-07T22:27+0800"/>
 <meta name="author" content="Changsheng Jiang"/>
 <meta name="description" content=""/>
 <meta name="keywords" content=""/>
@@ -84,8 +84,12 @@ for the JavaScript code in this tag.
 <li><a href="#sec-1">1 Introduction</a></li>
 <li><a href="#sec-2">2 getopt in unistd.h</a></li>
 <li><a href="#sec-3">3 parse_options in git source code</a></li>
-<li><a href="#sec-4">4 argparse in Python</a></li>
-<li><a href="#sec-5">5 a parser approach</a></li>
+<li><a href="#sec-4">4 boost::program_options</a></li>
+<li><a href="#sec-5">5 gflags</a></li>
+<li><a href="#sec-6">6 argparse in Python</a></li>
+<li><a href="#sec-7">7 docopt in Python</a></li>
+<li><a href="#sec-8">8 clime in Python</a></li>
+<li><a href="#sec-9">9 A State Monad Approach</a></li>
 </ul>
 </div>
 </div>
@@ -105,7 +109,7 @@ for the JavaScript code in this tag.
 </p>
 <p>
   This is implemented first in <a href="http://github.com/zuoyan/ysid">ysid</a> and adopted to douban and
-  evovled(finally in state monad there).
+  evolved(finally in state monad there).
 </p>
 </div>
 
@@ -184,8 +188,41 @@ cbs[<span style="color: #E6DB74;">'t'</span>] = {.cb = assign_int, .data = &amp;
 </div>
 
 <div id="outline-container-4" class="outline-2">
-<h2 id="sec-4"><span class="section-number-2">4</span> argparse in Python</h2>
+<h2 id="sec-4"><span class="section-number-2">4</span> boost::program_options</h2>
 <div class="outline-text-2" id="text-4">
+
+
+<p>
+  I don't like the design, an additional store and a map between name
+  and values. It's indirect, and you still have to fetch from the map
+  and set the variables.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> gflags</h2>
+<div class="outline-text-2" id="text-5">
+
+
+<p>
+  This known as google-gflags now hosts at <a href="https://github.com/schuhschuh/gflags">github</a>.
+</p>
+<p>
+  This library is recommended, esp. if no complex options needed. The
+  design is very simple, just assign values from command line.
+</p>
+<p>
+  It's not flexible enough as a general options parser.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-6" class="outline-2">
+<h2 id="sec-6"><span class="section-number-2">6</span> argparse in Python</h2>
+<div class="outline-text-2" id="text-6">
 
 
 <p>
@@ -199,9 +236,41 @@ cbs[<span style="color: #E6DB74;">'t'</span>] = {.cb = assign_int, .data = &amp;
 
 </div>
 
-<div id="outline-container-5" class="outline-2">
-<h2 id="sec-5"><span class="section-number-2">5</span> a parser approach</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-7" class="outline-2">
+<h2 id="sec-7"><span class="section-number-2">7</span> docopt in Python</h2>
+<div class="outline-text-2" id="text-7">
+
+
+<p>
+  <a href="https://github.com/docopt/docopt">docopt</a> can generate options parser automatically from help document.
+</p>
+<p>
+  This approach is very interesting, and it's the most descriptive as
+  far as I known!
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-8" class="outline-2">
+<h2 id="sec-8"><span class="section-number-2">8</span> clime in Python</h2>
+<div class="outline-text-2" id="text-8">
+
+
+<p>
+  <a href="https://github.com/moskytw/clime">clime</a> also generates options parser automatically from help
+  document, it mainlly used for sub commands. <code>clime</code> can using
+  introspective methods in Python to parse the arguments. But Python
+  is not a static type language, I think it's very limited in the
+  convertion.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-9" class="outline-2">
+<h2 id="sec-9"><span class="section-number-2">9</span> A State Monad Approach</h2>
+<div class="outline-text-2" id="text-9">
 
 
 <p>
@@ -210,7 +279,8 @@ cbs[<span style="color: #E6DB74;">'t'</span>] = {.cb = assign_int, .data = &amp;
   fields). Then, the options parser has to be a really parser.
 </p>
 <p>
-  A parser is a function consume input and gives semantic values.
+  A parser is a function consume input and gives semantic values and
+  run actions.
 </p>
 <p>
   I think it's the rule works for all options.
@@ -241,7 +311,7 @@ cbs[<span style="color: #E6DB74;">'t'</span>] = {.cb = assign_int, .data = &amp;
 
 
 <pre class="src src-c++"><span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">option_parser</span> {
-  add_option(option_match, option_process, <span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">doc</span>);
+  <span style="color: #66D9EF;">option_parser</span> &amp; <span style="color: #A6E22E;">add_option</span>(option_match, option_process, <span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">doc</span>);
   <span style="color: #66D9EF;">option_state</span> <span style="color: #A6E22E;">parse</span>(<span style="color: #66D9EF;">option_state</span>);
 };
 </pre>
@@ -297,11 +367,14 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 </pre>
 
 
-<p>
-  Caution: you'd better know something about monad and state monad,
-  just google monad, state monad. There are <b>too many</b> tutorials about
-  monad.
+
+<div class="marginnote">
+<p>  To understand following sample codes, you'd better know
+  something about monad and state monad, just google monad, state
+  monad. There are <b>too many</b> tutorials about monad.
 </p>
+</div>
+
 <p>
   For example, to allow variadic arguments, we have to using the monad verion of processing:
 </p>
@@ -375,6 +448,25 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 </pre>
 
 
+<p>
+  Another requirement is dynamic. The options parser runs the
+  processing function before moving on to next position. So we can
+  registered new options in the processing functions. This is very
+  useful for plugins to insert options dynamically.
+</p>
+
+
+
+<pre class="src src-c++">parser.add_option(
+  <span style="color: #E6DB74;">"load-plugin"</span>, [](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">name</span>) { dlopen(name.c_str(), ...); ...; }, <span style="color: #E6DB74;">"FILE::plugin file"</span>);
+</pre>
+
+
+<p>
+  In the plugin, if we take care that <code>parser</code> is external linked, we
+  can call add_option directly in the initial function. Symmetrically,
+  we can also call remove options.
+</p>
 
 
 <div id="disqus_thread"></div>

@@ -1,6 +1,7 @@
 @import url(http://fonts.googleapis.com/css?family=Inconsolata);
 @import url(http://fonts.googleapis.com/css?family=PT+Sans);
 @import url(http://fonts.googleapis.com/css?family=PT+Sans+Narrow:400,700);
+
 html {
   font-family: 'PT Sans', sans-serif;
 }
@@ -118,23 +119,33 @@ h6 {
   -webkit-border-radius: 0.2em;
   -moz-border-radius: 0.2em;
   border-radius: 0.2em;
-  foreground-color: #cb4b16;
+  color: #cb4b16;
 }
 .HOLD {
   -webkit-border-radius: 0.2em;
   -moz-border-radius: 0.2em;
   border-radius: 0.2em;
-  foreground-color: #d33682;
+  color: #d33682;
 }
 .NOTE {
   -webkit-border-radius: 0.2em;
   -moz-border-radius: 0.2em;
   border-radius: 0.2em;
-  foreground-color: #d33682;
+  color: #d33682;
 }
 .CANCELLED {
   -webkit-border-radius: 0.2em;
   -moz-border-radius: 0.2em;
   border-radius: 0.2em;
-  foreground-color: #859900;
+  color: #859900;
+}
+
+.marginnote {
+  background-color: #eee8d5;
+  color: #657b83;
+  border: 2pt #93a1a1 solid;
+  border-radius: 1em;
+  padding: 0 1em;
+  margin: 0 0 0 4em;
+  box-shadow: 5pt 5pt 8pt #eee8d5;
 }
