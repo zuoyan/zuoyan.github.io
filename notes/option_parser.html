@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Command Line Options Parser for C++, a state monad approach</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+<meta name="title" content="Command Line Options Parser for C++, a state monad approach"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2013-07-07T18:48+0800"/>
+<meta name="author" content="Changsheng Jiang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+
+<link rel="stylesheet" href="../css/weizi.css" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+<div id="org-div-home-and-up" style="text-align:right;font-size:70%;white-space:nowrap;">
+ <a accesskey="h" href="./"> UP </a>
+ |
+ <a accesskey="H" href="../"> HOME </a>
+</div>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">Command Line Options Parser for C++, a state monad approach</h1>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Introduction</a></li>
+<li><a href="#sec-2">2 getopt in unistd.h</a></li>
+<li><a href="#sec-3">3 parse_options in git source code</a></li>
+<li><a href="#sec-4">4 argparse in Python</a></li>
+<li><a href="#sec-5">5 a parser approach</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+  There are too many command line options parser library.
+</p>
+<p>
+  Here first we list some of them, and try to find a common pattern
+  under them and implement one in C++ which is easy to use and allows
+  almost all forms of options.
+</p>
+<p>
+  This is implemented first in <a href="http://github.com/zuoyan/ysid">ysid</a> and adopted to douban and
+  evovled(finally in state monad there).
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> getopt in unistd.h</h2>
+<div class="outline-text-2" id="text-2">
+
+
+<p>
+  See <a href="http://linux.die.net/man/3/getopt">man 3 getopt</a> for documents and usage examples.
+</p>
+<p>
+  IMHO, it's not very easy to use, and, most important, it's not
+  totally <b>descriptive</b>. You have to program options with switch. For
+  large programms, the options switch may be very long. One way to
+  avoid this, is registering callback function for every option, like
+  this
+</p>
+
+
+
+<pre class="src src-c"><span style="color: #F92672;">typedef</span> <span style="color: #66D9EF;">void</span> (*<span style="color: #66D9EF;">callback</span>)(<span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">o</span>, <span style="color: #66D9EF;">void</span> *<span style="color: #FD971F;">data</span>);
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">option_cb</span> {
+  <span style="color: #66D9EF;">callback</span> <span style="color: #FD971F;">cb</span>;
+  <span style="color: #66D9EF;">void</span> * <span style="color: #FD971F;">data</span>;
+};
+<span style="color: #66D9EF;">option_cb</span> <span style="color: #FD971F;">cbs</span>[128];
+
+<span style="color: #F92672;">while</span> ((opt = getopt(argc, argv, <span style="color: #E6DB74;">"nt:"</span>)) != -1) {
+  <span style="color: #F92672;">if</span> (opt &gt;= 0 &amp;&amp; opt &lt; ARRAY_SIZE(cbs)) {
+    cbs[opt].cb(opt, cbs[opt].data);
+  } <span style="color: #F92672;">else</span> {
+    fprintf(stderr, <span style="color: #E6DB74;">"error message for unkown ..."</span>);
+    exit(1);
+  }
+}
+</pre>
+
+
+<p>
+  For example, the assign <code>flag=1</code> is convert to
+</p>
+
+
+
+<pre class="src src-c"><span style="color: #F92672;">static</span> <span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">assign_int</span>(<span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">opt</span>, <span style="color: #66D9EF;">void</span> *<span style="color: #FD971F;">data</span>) {
+   *(<span style="color: #66D9EF;">int</span>*)(data) = 1;
+}
+cbs[<span style="color: #E6DB74;">'t'</span>] = {.cb = assign_int, .data = &amp;flag};
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> parse_options in git source code</h2>
+<div class="outline-text-2" id="text-3">
+
+
+<p>
+  See <a href="https://github.com/git/git/blob/master/parse-options.h">parse options</a> for document and <a href="https://github.com/git/git/tree/master/builtin">builtin commands</a> for examples.
+</p>
+<p>
+  <code>git</code> and it's subcommands have very many different options to parse
+  and I think the options parser must be very versatile behinds
+  these. It is. I have stealed the code out of git source tree, and
+  very happy in most times. It's descriptive, but the flags and fields
+  tables are a little long.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> argparse in Python</h2>
+<div class="outline-text-2" id="text-4">
+
+
+<p>
+  See <a href="http://docs.python.org/dev/library/argparse.html">argparse</a> for document and usage examples.
+</p>
+<p>
+  It's very easy to use, and, it's descriptive. I can use it without
+  looking up the document after several times for most simple jobs.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> a parser approach</h2>
+<div class="outline-text-2" id="text-5">
+
+
+<p>
+  If we think the options parser from a very general view, and don't
+  allow any special/escape cases(and so no long tables of flags,
+  fields). Then, the options parser has to be a really parser.
+</p>
+<p>
+  A parser is a function consume input and gives semantic values.
+</p>
+<p>
+  I think it's the rule works for all options.
+</p>
+<p>
+  To add options, we just add functions <code>state -&gt; (value, state)</code>. In
+  a real imparative world, we can't just run the funcitons one by one,
+  catch the exceptions, and rollback the state. We can rollback the
+  state of argv but we can't rollback side effects. Or, we can make it
+  as a requirements, any function should rollback itself if it doesn't
+  happy with current state. But to allow ambiguous options, the
+  funciton doesn't know it should consume the current state and take
+  the real action(which may be unrollback-able), or give the chance
+  to others.
+</p>
+<p>
+  So we have to find the real function to execute at every state. An
+  easy way is splitting every parsing function as matching and
+  processing parts. A matching is <code>state -&gt; (priority, state)</code>, it
+  should have no side effects. And a processing is <code>state -&gt; (a,   state)</code>, where <code>a</code> is the value type of the processing, it's can be
+  any type. At any state, all matching is called, but at most one
+  processing is called.
+</p>
+<p>
+  In this way, we have model the options parser as
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">option_parser</span> {
+  add_option(option_match, option_process, <span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">doc</span>);
+  <span style="color: #66D9EF;">option_state</span> <span style="color: #A6E22E;">parse</span>(<span style="color: #66D9EF;">option_state</span>);
+};
+</pre>
+
+
+<p>
+  It's not easy to use, and it's not descriptive. We have to do more
+  than just functions.
+</p>
+<p>
+  <code>option_match</code> should be constructable from a description
+  string. For example, a string <code>i|if|in-file</code> means a matching
+  function to check whether current arg is matched by regular
+  expression <code>--*(i|if|in-file)</code>. '|' is choosed, because it means
+  'or' and it means pipe in shell, should never be used in options.
+</p>
+<p>
+  <code>option_process</code> should be constructable from a value pointer, a
+  function, and a state monad.
+</p>
+<p>
+  When giving a value pointer, the process should consume one arg from
+  the state(move on the state position to next arg), and assign the
+  content of the pointer as the value converted from the arg from
+  string.
+</p>
+<p>
+  When giving a function, the process should consume a number, the
+  arity of the function, args from the state. And convert the args to
+  the parameters type of the function, invoke it, and return the value
+  and the moved state.
+</p>
+<p>
+  When giving a state moand, the process just call the function
+  wrapped in the state monad, the function will return the value and
+  newer state.
+</p>
+<p>
+  This is a example usage from above description.
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #66D9EF;">option_parser</span> <span style="color: #FD971F;">parser</span>;
+<span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">flag</span> = 0;
+<span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">x</span> = 3.14;
+<span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">y</span> = 1.414;
+parser.add_option(<span style="color: #E6DB74;">"f|flag"</span>, [&amp;]() {flag = 1;}, <span style="color: #E6DB74;">"toggle flag on"</span>)
+parser.add_option(<span style="color: #E6DB74;">"no-flag"</span>, [&amp;]() {flag = 0;}, <span style="color: #E6DB74;">"toggle flag off"</span>)
+parser.add_option(<span style="color: #E6DB74;">"x|x-value"</span>, &amp;x, <span style="color: #E6DB74;">"FLOAT::x value"</span>);
+parser.add_option(<span style="color: #E6DB74;">"y|y-value"</span>, &amp;y, <span style="color: #E6DB74;">"FLOAT::y value"</span>);
+parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">x_</span>, <span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">y_</span>) { x = x_; y = y_; }, <span style="color: #E6DB74;">"FLOAT FLOAT::x and y"</span>);
+</pre>
+
+
+<p>
+  Caution: you'd better know something about monad and state monad,
+  just google monad, state monad. There are <b>too many</b> tutorials about
+  monad.
+</p>
+<p>
+  For example, to allow variadic arguments, we have to using the monad verion of processing:
+</p>
+
+
+
+<pre class="src src-c++">parser.add_option(
+  <span style="color: #E6DB74;">"files"</span>, liftm([](<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; <span style="color: #FD971F;">fns</span>) { ... },
+                 <span style="color: #66D9EF;">state_many</span>&lt;<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; &gt; (<span style="color: #66D9EF;">pos_value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;())),
+  <span style="color: #E6DB74;">"FILE*::processing files"</span>)
+</pre>
+
+
+<p>
+  Where <code>pos_value&lt;T&gt;</code> is a processing <code>state -&gt; (maybe&lt;T&gt;, state)</code>,
+  which only accept a non-option argument(not prefixed by
+  '-'). <code>state_many</code> run the giving state monad, gather all values
+  until it's failed(return nothing).
+</p>
+<p>
+  The variadic arguments is not easy to implement if the parser is not
+  really a parser. Most of parsers can gather all not parsed arguments
+  as variadic arguments, but we can't support multiple variadic
+  arguments in this way.
+</p>
+
+
+
+<pre class="src src-c++">parser.add_option(
+  <span style="color: #E6DB74;">"env-run"</span>, liftm(
+     [](<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; <span style="color: #FD971F;">env</span>, <span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; <span style="color: #FD971F;">cmd_argv</span>) { ... },
+     <span style="color: #66D9EF;">state_many</span>&lt;<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; &gt;(<span style="color: #66D9EF;">pred_value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;()([](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">s</span>) { <span style="color: #F92672;">return</span> s.find(<span style="color: #E6DB74;">'='</span>) &lt; s.size(); })),
+     <span style="color: #66D9EF;">value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;() &gt;&gt;= [](<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">sep</span>) {
+       <span style="color: #F92672;">return</span> state_many&lt;<span style="color: #66D9EF;">vector</span>&lt;string&gt;(
+          liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) -&gt; <span style="color: #66D9EF;">maybe</span>&lt;string&gt; { v == sep ? nothing : just(v); },
+                <span style="color: #66D9EF;">value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;()));
+     }), <span style="color: #E6DB74;">"[NAME=VALUE]* SEP CMD-ARG* SEP:: run command with environment"</span>);
+</pre>
+
+
+<p>
+  Where <code>value</code> just returns a state monad <code>state -&gt; (T, state)</code>,
+  where <code>T</code> the value type.  <code>pred_value</code> returns a function, who
+  takes a prediction and return a state monad, the monad function
+  returns nothing(injected to state monad) if prediction return false
+  on the value, otherwise, pass the value(wrap with maybe and injected
+  to state monad), i.e. <code>(T -&gt; bool) -&gt; (state -&gt; (T, state))</code>.
+</p>
+<p>
+  If this variadic pattern is used very often, we can extract it as
+  functions:
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">container :: () -&gt; State [a]</span>
+<span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">VS</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">T</span>=<span style="color: #66D9EF;">container_value_type</span>&lt;<span style="color: #66D9EF;">VS</span>&gt; &gt;
+<span style="color: #F92672;">auto</span> <span style="color: #A6E22E;">container</span>() {
+  <span style="color: #F92672;">return</span> <span style="color: #66D9EF;">state_many</span>&lt;VS&gt;(<span style="color: #66D9EF;">pos_value</span>&lt;<span style="color: #66D9EF;">T</span>&gt;());
+}
+
+<span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">sep_container :: () -&gt; (String -&gt; State [a])</span>
+<span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">VS</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">T</span>=<span style="color: #66D9EF;">container_value_type</span>&lt;<span style="color: #66D9EF;">VS</span>&gt; &gt;
+<span style="color: #F92672;">auto</span> <span style="color: #A6E22E;">sep_container</span>() {
+  <span style="color: #F92672;">return</span> [](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">sep</span>) {
+     <span style="color: #F92672;">return</span> <span style="color: #66D9EF;">state_many</span>&lt;VS&gt;(
+        liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) -&gt; <span style="color: #66D9EF;">maybe</span>&lt;T&gt; { v == sep ? nothing : just(<span style="color: #66D9EF;">from_text</span>&lt;<span style="color: #66D9EF;">T</span>&gt;(<span style="color: #FD971F;">v</span>)); },
+              <span style="color: #66D9EF;">value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;()));
+  };
+}
+</pre>
+
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<div style='clear:both;margin-top:20px'></div><hr /><div style='float:right;font-size:1.2em'><a href='mailto:changsheng@weizi.org'>Changsheng Jiang</a></div><div style='clear:both'></div>
+</div>
+</body>
+</html>

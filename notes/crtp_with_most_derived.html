@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>CRTP Pattern with Most Derived Rebind, streambuf as Example</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="title" content="CRTP Pattern with Most Derived Rebind, streambuf as Example"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2013-07-07T01:52+0800"/>
+<meta name="author" content="Changsheng Jiang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+
+<link rel="stylesheet" href="../css/weizi.css" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+<div id="org-div-home-and-up" style="text-align:right;font-size:70%;white-space:nowrap;">
+ <a accesskey="h" href="./"> UP </a>
+ |
+ <a accesskey="H" href="../"> HOME </a>
+</div>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">CRTP Pattern with Most Derived Rebind, streambuf as Example</h1>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 The Name</a></li>
+<li><a href="#sec-2">2 streambuf Example</a></li>
+<li><a href="#sec-3">3 The Problem</a></li>
+<li><a href="#sec-4">4 The Solution</a></li>
+<li><a href="#sec-5">5 The Result</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> The Name</h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+  <a href="http://en.wikipedia.org/wiki/Curiously_recurring_template_pattern">CRTP</a>(Curiously Recurring Template Pattern) is a C++ idiom in which a
+  class X derives from a class template instantiation using X itself
+  as template argument.
+</p>
+<p>
+  CRTP is used for static polymorphism, to avoid virtual functions,
+  and give the compiler a chance to do the best optimization. Call of
+  virtual function doesn't cost much, esp. with correctly predicted
+  branch. but virtual function stop the inline optimization, and cost
+  very much for floating point numeric algorithms.
+</p>
+<p>
+  CRTP is used for equipping object with interfaces based on a very
+  smaller set of interfaces.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> streambuf Example</h2>
+<div class="outline-text-2" id="text-2">
+
+
+<p>
+  <code>std::streambuf</code> is a suitable example. Most of the public/protected
+  functions is implemented based on virtual functions <code>overflow</code>,
+  <code>underflow</code>, <code>uflow</code>. Functions like <code>xsgetn</code> and <code>xsputn</code> with
+  default implementation, based on <code>overflow</code>, <code>underflow</code>,
+  <code>uflow</code>. The pointer <code>gptr</code>, <code>pptr</code> are null if it's not modified by
+  the derived object. Every time in the loop, <code>xsgetn</code> / <code>xsputn</code>
+  check the pointer range. If it's not empty(the pointer range
+  modified by the derived object), <code>memcpy</code> can be used for
+  performance. If it's empty(or all exhausted), <code>uflow</code> / <code>overflow</code>
+  is called.
+</p>
+<p>
+  In some instances(char oriented), <code>gptr</code> and <code>pptr</code> are always null,
+  we can override the implementation without the check. And in some
+  instances, the whole buffer is contiguous, then <code>overflow</code> / <code>uflow</code>
+  always return <code>eof</code>. We can override the virtual functions with
+  these conditions. But not the non-virtual one.
+</p>
+<p>
+  CRTP is suit to solve these two problems, without dynamic cost.
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Derived</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Char</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Traits</span>&gt;
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">streambuf_base</span> {
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">....</span>
+
+  <span style="color: #66D9EF;">Derived</span> &amp; <span style="color: #A6E22E;">get_derived</span>() {
+    <span style="color: #F92672;">return</span> *<span style="color: #F92672;">this</span>;
+  }
+
+  <span style="color: #F92672;">const</span> <span style="color: #66D9EF;">Derived</span> &amp; <span style="color: #A6E22E;">get_derived</span>() <span style="color: #F92672;">const</span> {
+    <span style="color: #F92672;">return</span> *<span style="color: #F92672;">this</span>;
+  }
+
+  <span style="color: #66D9EF;">int_type</span> <span style="color: #A6E22E;">snextc</span>() {
+    <span style="color: #66D9EF;">int_type</span> <span style="color: #FD971F;">r</span> = <span style="color: #4e9a06;">traits_type</span>::eof();
+    <span style="color: #F92672;">if</span> (get_derived().sbumpc() != <span style="color: #4e9a06;">traits_type</span>::eof())
+      r = get_derived().sgetc();
+    <span style="color: #F92672;">return</span> r;
+  }
+
+  <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">....</span>
+};
+</pre>
+
+
+<p>
+  The default <code>snextc</code> implementation uses <code>sbumpc</code> and <code>sgetc</code>, with
+  <code>get_dervied</code> prefix, the functions are resolved from derived to
+  template base. Only if the derived doesn't override these functions,
+  the template base's default are taken.
+</p>
+<p>
+  For example, stringbuf, alike to <code>std::stringbuf</code>, can implement
+  <code>snextc</code>, <code>sbumpc</code> and <code>sgetc</code>, just with one pointer
+  comparation. All other default implementations will use this
+  new-implemented version, thanks to <code>get_derived</code> prefix.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> The Problem</h2>
+<div class="outline-text-2" id="text-3">
+
+
+<p>
+  The above is fine with just static polymorphism. The problems raise
+  if we want the <code>streambuf_base</code> be compatible with <code>std::streambuf</code>,
+  to reuse all routines who only accepts <code>std::streambuf</code>. So we must
+  inherit from <code>std::streambuf</code>.
+</p>
+<p>
+  We can't inherit from <code>std::streambuf</code> in <code>derived</code>. If we do, any
+  functions not re-implemented by derived will be ambiguous.
+</p>
+<p>
+  Inherit from <code>std::streambuf</code> in <code>streambuf_base</code> is fine. But then
+  the default implementations in <code>streambuf_base</code> will override all in
+  <code>std::streambuf</code>. It's ok in these case, but not acceptable if we
+  inherit from another base, which provides more resonable
+  implementations than <code>streambuf_base</code>.
+</p>
+<p>
+  So, what we want is an order of functions resolution. from derived
+  to ancestor(std::streambuf in former case), and at last
+  <code>streambuf_base</code>.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> The Solution</h2>
+<div class="outline-text-2" id="text-4">
+
+
+<p>
+  First, we must modify the <code>streambuf_base</code> to take another
+  <code>Ancestor</code> type parameters, and provides <code>dummy</code> as default.
+</p>
+<p>
+  We can check whether <code>Ancestor</code> is <code>dummy</code> in every
+  <code>streambuf_base</code>'s function. If <code>Ancestor</code> is not <code>dummy</code>, we just
+  call <code>Ancestor</code>'s version. Otherwise, the default implementation is
+  taken.
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Derived</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Char</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Traits</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Ancestor</span>=<span style="color: #66D9EF;">dummy</span>&gt;
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">streambuf_base</span> : <span style="color: #66D9EF;">Ancestor</span> {
+  <span style="color: #F92672;">static</span> <span style="color: #F92672;">const</span> <span style="color: #66D9EF;">bool</span> <span style="color: #FD971F;">is_dummy</span> = <span style="color: #4e9a06;">std</span>::<span style="color: #4e9a06;">is_same</span>&lt;Ancestor, <span style="color: #FD971F;">dummy</span>&gt;::value;
+  <span style="color: #F92672;">typedef</span> <span style="color: #F92672;">typename</span> <span style="color: #4e9a06;">std</span>::<span style="color: #4e9a06;">conditional</span>&lt;
+    is_dummy, <span style="color: #66D9EF;">streambuf_base</span>, <span style="color: #66D9EF;">Ancestor</span>&gt;::<span style="color: #66D9EF;">type</span> <span style="color: #66D9EF;">ancestor_type</span>;
+
+  <span style="color: #66D9EF;">int_type</span> <span style="color: #A6E22E;">snextc</span>() {
+    <span style="color: #F92672;">if</span> (<span style="color: #dc322f;">!</span>is_dummy) <span style="color: #F92672;">return</span> <span style="color: #4e9a06;">ancestor_type</span>::snextc();
+    <span style="color: #66D9EF;">int_type</span> <span style="color: #FD971F;">r</span> = <span style="color: #4e9a06;">traits_type</span>::eof();
+    <span style="color: #F92672;">if</span> (get_derived().sbumpc() != <span style="color: #4e9a06;">traits_type</span>::eof())
+      r = get_derived().sgetc();
+    <span style="color: #F92672;">return</span> r;
+  }
+};
+</pre>
+
+
+<p>
+  This introduces some other problems. If <code>Ancestor</code> is another one
+  derived from <code>streambuf_base</code>, the <code>Ancestor::get_derived</code> is
+  wrong. So if <code>Ancestor::snextc</code> is taken, <code>Ancestor::snextc</code> will
+  call another <code>sbumpc</code> and <code>sgetc</code>, not the most-derived object's
+  one.
+</p>
+<p>
+  One solution to this problem is using virtual functions. But make
+  all functions be virutal is not a good solution.
+</p>
+<p>
+  Another solution is to redefine the <code>get_derived</code>. Add another
+  <code>MostDerived</code> paramter to <code>streambuf_base</code>, and add
+  <code>most_derived_rebind</code> meta functor. For every <code>Ancestor</code>, we check
+  whether <code>Ancestor::most_derived_rebind</code> exists. If it exists,
+  <code>streambuf_base</code> inherited from
+  <code>Ancestor::most_derived_rebind::template apply&lt;MostDerived&gt;::type</code>
+  instead of <code>Ancestor</code>.
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Derived</span>,
+          <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Ancestor</span>,
+          <span style="color: #66D9EF;">bool</span>=<span style="color: #4e9a06;">has_nested_type_most_derived_rebind</span>&lt;<span style="color: #66D9EF;">Ancestor</span>&gt;::value&gt;
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">streambuf_base_rebind_ancestor</span> {
+  <span style="color: #F92672;">typedef</span> <span style="color: #66D9EF;">Base</span> <span style="color: #66D9EF;">type</span>;
+};
+
+<span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Derived</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Base</span>&gt;
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">streambuf_base_rebind_ancestor</span>&lt;<span style="color: #66D9EF;">Derived</span>, <span style="color: #66D9EF;">Ancestor</span>, <span style="color: #4e9a06;">true</span>&gt; {
+  <span style="color: #F92672;">typedef</span> <span style="color: #F92672;">typename</span> <span style="color: #4e9a06;">Ancestor</span>::<span style="color: #4e9a06;">most_derived_rebind</span>::<span style="color: #F92672;">template</span> <span style="color: #4e9a06;">apply</span>&lt;<span style="color: #66D9EF;">Derived</span>&gt;::<span style="color: #66D9EF;">type</span> <span style="color: #66D9EF;">type</span>;
+};
+
+<span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Derived</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Char</span>, <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Traits</span>,
+  <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Ancestor</span>=<span style="color: #66D9EF;">dummy</span>,
+  <span style="color: #F92672;">class</span> <span style="color: #66D9EF;">MostDerived</span>=<span style="color: #66D9EF;">Derived</span>&gt;
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">streambuf_base</span> : <span style="color: #4e9a06;">streambuf_base_rebind_ancestor</span>&lt;<span style="color: #66D9EF;">MostDerived</span>, <span style="color: #66D9EF;">Ancestor</span>&gt;::<span style="color: #66D9EF;">type</span> {
+  <span style="color: #F92672;">typedef</span> <span style="color: #F92672;">typename</span> <span style="color: #4e9a06;">streambuf_base_rebind_ancestor</span>&lt;
+    <span style="color: #66D9EF;">MostDerived</span>, <span style="color: #66D9EF;">Ancestor</span>&gt;::<span style="color: #66D9EF;">type</span> <span style="color: #66D9EF;">_ancestor_type</span>;
+  <span style="color: #F92672;">typedef</span> <span style="color: #F92672;">typename</span> <span style="color: #4e9a06;">std</span>::<span style="color: #4e9a06;">conditional</span>&lt;
+    <span style="color: #4e9a06;">std</span>::<span style="color: #4e9a06;">is_same</span>&lt;<span style="color: #66D9EF;">_ancestor_type</span>, dummy&gt;::value,
+    <span style="color: #66D9EF;">streambuf_base</span>, <span style="color: #66D9EF;">_ancestor_type</span>&gt;::<span style="color: #66D9EF;">type</span> <span style="color: #66D9EF;">ancestor_type</span>;
+
+  <span style="color: #66D9EF;">MostDerived</span> &amp; <span style="color: #A6E22E;">get_derived</span>() {
+    <span style="color: #F92672;">return</span> *<span style="color: #F92672;">this</span>;
+  }
+
+  <span style="color: #F92672;">const</span> <span style="color: #66D9EF;">MostDerived</span> &amp; <span style="color: #A6E22E;">get_derived</span>() <span style="color: #F92672;">const</span> {
+    <span style="color: #F92672;">return</span> *<span style="color: #F92672;">this</span>;
+  }
+
+  <span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">most_derived_rebind</span> {
+    <span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">T</span>&gt;
+    <span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">apply</span> {
+      <span style="color: #F92672;">typedef</span> <span style="color: #66D9EF;">streambuf_base</span>&lt;<span style="color: #66D9EF;">Derived</span>, <span style="color: #66D9EF;">Char</span>, <span style="color: #66D9EF;">Traits</span>, <span style="color: #66D9EF;">Ancestor</span>, <span style="color: #66D9EF;">T</span>&gt; <span style="color: #66D9EF;">type</span>;
+    };
+  };
+};
+
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> The Result</h2>
+<div class="outline-text-2" id="text-5">
+
+
+<p>
+  With above <code>streambuf_base</code>, we can implements text format
+  input/output routines in very higher performance, even faster than
+  <code>strtod</code> / <code>strtol</code> in experiments(locale is ignored).
+</p>
+<p>
+  The floating pointer converion is done by <a href="http://code.google.com/p/double-conversion">double-conversion</a>, in
+  shorted mode. For printf/scanf and stringstream, the precision
+  is 20.
+</p>
+<p>
+  The random sequence for floating is generated by <code>random() / M_PI</code>
+  and for long, just <code>random()</code>.
+</p>
+<p>
+  For <code>fscanf</code> and <code>fprintf</code>, the <code>FILE*</code> is obtained by <code>fmemopen</code>
+  and <code>open_memstream</code>.
+</p>
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption>Random generated input speed(in nano-seconds)</caption>
+<colgroup><col class="left" /><col class="right" /><col class="right" /><col class="right" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">implements / type</th><th scope="col" class="right">long</th><th scope="col" class="right">float</th><th scope="col" class="right">double</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">streambuf_base</td><td class="right">45.13806234741213</td><td class="right">87.06188110351565</td><td class="right">193.94798608398446</td></tr>
+<tr><td class="left">strtox</td><td class="right">56.38690736389162</td><td class="right">99.91599140930177</td><td class="right">246.5969282989502</td></tr>
+<tr><td class="left">fscanf</td><td class="right">201.75892387390138</td><td class="right">244.81490730285645</td><td class="right">437.06397615051276</td></tr>
+<tr><td class="left">istringstream</td><td class="right">168.8839549407959</td><td class="right">382.54306460571297</td><td class="right">674.1460767364503</td></tr>
+</tbody>
+</table>
+
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption>Random generated output speed(in nano-seconds)</caption>
+<colgroup><col class="left" /><col class="right" /><col class="right" /><col class="right" />
+</colgroup>
+<thead>
+<tr><th scope="col" class="left">implements / type</th><th scope="col" class="right">long</th><th scope="col" class="right">float</th><th scope="col" class="right">double</th></tr>
+</thead>
+<tbody>
+<tr><td class="left">streambuf_base</td><td class="right">109.96006123352053</td><td class="right">221.0190715637207</td><td class="right">285.9951219940186</td></tr>
+<tr><td class="left">snprintf</td><td class="right">290.8328487548828</td><td class="right">1263.6021590270996</td><td class="right">1915.7261646881104</td></tr>
+<tr><td class="left">fprintf</td><td class="right">279.30502569580074</td><td class="right">1298.2731170043944</td><td class="right">2073.194082229614</td></tr>
+<tr><td class="left">ostringstream</td><td class="right">122.75186352539063</td><td class="right">1086.216874282837</td><td class="right">1651.6398792114258</td></tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<div style='clear:both;margin-top:20px'></div><hr /><div style='float:right;font-size:1.2em'><a href='mailto:changsheng@weizi.org'>Changsheng Jiang</a></div><div style='clear:both'></div>
+</div>
+</body>
+</html>

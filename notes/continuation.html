@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>simple/naive implementation of continuation/coroutine/generator on GNU/Linux</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="title" content="simple/naive implementation of continuation/coroutine/generator on GNU/Linux"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2013-07-07T01:50+0800"/>
+<meta name="author" content="Changsheng Jiang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+
+<link rel="stylesheet" href="../css/weizi.css" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+<div id="org-div-home-and-up" style="text-align:right;font-size:70%;white-space:nowrap;">
+ <a accesskey="h" href="./"> UP </a>
+ |
+ <a accesskey="H" href="../"> HOME </a>
+</div>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">simple/naive implementation of continuation/coroutine/generator on GNU/Linux</h1>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 the names</a></li>
+<li><a href="#sec-2">2 continuation</a></li>
+<li><a href="#sec-3">3 generator</a></li>
+<li><a href="#sec-4">4 coroutine</a></li>
+<li><a href="#sec-5">5 usage and test</a>
+<ul>
+<li><a href="#sec-5-1">5.1 primes</a></li>
+<li><a href="#sec-5-2">5.2 producer and consumer</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> the names</h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+For reference, see wikipedia
+<a href="http://en.wikipedia.org/wiki/Continuation">http://en.wikipedia.org/wiki/Continuation</a>,
+<a href="http://en.wikipedia.org/wiki/Coroutine">http://en.wikipedia.org/wiki/Coroutine</a> and see python's <code>yield</code>, it's
+not easy/I'm lazy to clarify them here.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> continuation</h2>
+<div class="outline-text-2" id="text-2">
+
+
+<p>
+In some senses, <code>ucontext.h</code> is already a implementation of
+<code>continuation</code>, which is available on most modern OS(standarded by
+POSIX). In C99, we also have <code>setjmp/longjmp</code> to implement
+continuation. But <code>setjmp/longjmp</code> is weaker than <code>ucontext.h</code>.
+</p>
+<p>
+Folowing code are just a demo, not suit for production usage. g++-4.7
+is required.
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #66D9EF;">#include</span> <span style="color: #E6DB74;">&lt;ucontext.h&gt;</span>
+<span style="color: #66D9EF;">#include</span> <span style="color: #E6DB74;">&lt;functional&gt;</span> <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">for type erasure, or, we have to make continuation a template</span>
+
+<span style="color: #66D9EF;">#define</span> <span style="color: #A6E22E;">CLOG</span>(...) <span style="color: #75715E; font-style: italic;">// </span><span style="color: #75715E; font-style: italic;">we don't have/need CLOG</span>
+
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">continuation</span> {
+  <span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Func</span>&gt;
+  <span style="color: #A6E22E;">continuation</span>(<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">Func</span> &amp; <span style="color: #FD971F;">func</span>, <span style="color: #66D9EF;">size_t</span> <span style="color: #FD971F;">stack_size</span>=1&lt;&lt;18) {
+    m_stack.resize(stack_size);
+    m_func = func;
+    <span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">r</span> = getcontext(&amp;m_ctxs[1]);
+    assert(r == 0);
+    m_ctxs[1].uc_link = &amp;m_ctxs[0];
+    m_ctxs[1].uc_stack.ss_sp = &amp;m_stack[0];
+    m_ctxs[1].uc_stack.ss_size = m_stack.size();
+    <span style="color: #75715E; font-style: italic;">// </span><span style="color: #ff0000; background-color: #ffff00; font-weight: bold; text-decoration: underline;">TODO</span><span style="color: #75715E; font-style: italic;">: x86_64 is safe to pass pointer with glibc, but for other platform ...</span>
+    makecontext(&amp;m_ctxs[1], (<span style="color: #66D9EF;">void</span> (*)(<span style="color: #66D9EF;">void</span>))&amp;s_context_func, 1, <span style="color: #F92672;">this</span>);
+  }
+
+  <span style="color: #A6E22E;">continuation</span>(<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">continuation</span> &amp;<span style="color: #FD971F;">r</span>) = <span style="color: #F92672;">delete</span>;
+  <span style="color: #66D9EF;">continuation</span> &amp; <span style="color: #F92672;">operator</span><span style="color: #A6E22E;">=</span>(<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">continuation</span> &amp;<span style="color: #FD971F;">r</span>) = <span style="color: #F92672;">delete</span>;
+
+  <span style="color: #66D9EF;">int</span> <span style="color: #A6E22E;">swap</span>() {
+    <span style="color: #F92672;">if</span> (m_in_done) <span style="color: #F92672;">return</span> -1;
+    CLOG(DEBUG, <span style="color: #E6DB74;">"swap from"</span>, (m_is_in ? <span style="color: #E6DB74;">"in"</span> : <span style="color: #E6DB74;">"out"</span>));
+    m_is_in = <span style="color: #dc322f;">!</span>m_is_in;
+    swapcontext(&amp;m_ctxs[<span style="color: #dc322f;">!</span>m_is_in], &amp;m_ctxs[m_is_in]);
+    CLOG(DEBUG, <span style="color: #E6DB74;">"after swap"</span>);
+    <span style="color: #F92672;">if</span> (m_in_done) <span style="color: #F92672;">return</span> 0;
+    <span style="color: #F92672;">return</span> 1;
+  }
+
+  <span style="color: #F92672;">static</span> <span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">s_context_func</span>(<span style="color: #66D9EF;">continuation</span> *<span style="color: #FD971F;">self</span>) {
+    <span style="color: #F92672;">return</span> self-&gt;context_func();
+  }
+
+  <span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">context_func</span>() {
+    m_func();
+    m_in_done = 1;
+  }
+
+  <span style="color: #66D9EF;">ucontext_t</span> <span style="color: #FD971F;">m_ctxs</span>[2];
+  <span style="color: #4e9a06;">std</span>::<span style="color: #66D9EF;">function</span>&lt;<span style="color: #66D9EF;">void</span>(<span style="color: #66D9EF;">void</span>)&gt; <span style="color: #FD971F;">m_func</span>;
+  <span style="color: #4e9a06;">std</span>::<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">char</span>&gt; <span style="color: #FD971F;">m_stack</span>;
+  <span style="color: #66D9EF;">bool</span> <span style="color: #FD971F;">m_is_in</span> = <span style="color: #4e9a06;">false</span>;
+  <span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">m_in_done</span> = 0;
+};
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> generator</h2>
+<div class="outline-text-2" id="text-3">
+
+
+
+
+
+<pre class="src src-c++"><span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">T</span>&gt;
+<span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">generator</span> : <span style="color: #66D9EF;">continuation</span> {
+  <span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Func</span>&gt;
+  <span style="color: #A6E22E;">generator</span>(<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">Func</span> &amp;<span style="color: #FD971F;">func</span>)
+  : continuation(func) {
+
+  }
+
+  <span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">yield</span>(<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">T</span> &amp;<span style="color: #FD971F;">value</span>) {
+    m_value = value;
+    swap();
+  }
+
+  <span style="color: #66D9EF;">T</span> <span style="color: #A6E22E;">yield</span>() {
+    <span style="color: #F92672;">if</span> (swap() &lt;= 0) <span style="color: #F92672;">throw</span> <span style="color: #4e9a06;">std</span>::runtime_error(<span style="color: #E6DB74;">"end of iteration"</span>);
+    <span style="color: #F92672;">return</span> m_value;
+  }
+
+  T <span style="color: #F92672;">volatile</span> <span style="color: #FD971F;">m_value</span>;
+};
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4"><span class="section-number-2">4</span> coroutine</h2>
+<div class="outline-text-2" id="text-4">
+
+
+
+
+
+<pre class="src src-c++"><span style="color: #F92672;">struct</span> <span style="color: #66D9EF;">coroutine</span> : <span style="color: #66D9EF;">continuation</span> {
+  <span style="color: #F92672;">template</span> &lt;<span style="color: #F92672;">class</span> <span style="color: #66D9EF;">Func</span>&gt;
+  <span style="color: #A6E22E;">generator</span>(<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">Func</span> &amp;<span style="color: #FD971F;">func</span>)
+  : continuation(func) {
+
+  }
+
+  <span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">yield</span>(<span style="color: #66D9EF;">coroutine</span> &amp;<span style="color: #FD971F;">other</span>) {
+    other.swap();
+  }
+};
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5"><span class="section-number-2">5</span> usage and test</h2>
+<div class="outline-text-2" id="text-5">
+
+
+
+</div>
+
+<div id="outline-container-5-1" class="outline-3">
+<h3 id="sec-5-1"><span class="section-number-3">5.1</span> primes</h3>
+<div class="outline-text-3" id="text-5-1">
+
+
+<p>
+   A simple program to print primes(not all).
+</p>
+
+
+
+<pre class="src src-c++"><span style="color: #66D9EF;">bool</span> <span style="color: #A6E22E;">is_prime</span>(<span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">n</span>) {
+  <span style="color: #F92672;">if</span> (n % 2 == 0) <span style="color: #F92672;">return</span> n == 2;
+  <span style="color: #F92672;">for</span> (<span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">p</span> = 3; p * p &lt;= n; p += 2) {
+    <span style="color: #F92672;">if</span> (n % p == 0) <span style="color: #F92672;">return</span> <span style="color: #4e9a06;">false</span>;
+  }
+  <span style="color: #F92672;">return</span> <span style="color: #4e9a06;">true</span>;
+}
+
+<span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">primes</span>(<span style="color: #66D9EF;">generator</span>&lt;<span style="color: #66D9EF;">int</span>&gt; &amp;<span style="color: #FD971F;">g</span>) {
+  g.yield(2);
+  <span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">i</span> = 3;
+  <span style="color: #F92672;">while</span> (1) {
+    <span style="color: #F92672;">if</span> (is_prime(i)) g.yield(i);
+    i += 2;
+  }
+}
+
+<span style="color: #66D9EF;">int</span> <span style="color: #A6E22E;">main</span>() {
+  <span style="color: #66D9EF;">generator</span>&lt;<span style="color: #66D9EF;">int</span>&gt; <span style="color: #FD971F;">g</span>([&amp;]() {
+      primes(g);
+    });
+  <span style="color: #F92672;">while</span> (1) {
+    <span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">p</span> = g.yield();
+    <span style="color: #4e9a06;">std</span>::cout &lt;&lt; p &lt;&lt; <span style="color: #4e9a06;">std</span>::endl;
+  }
+}
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-5-2" class="outline-3">
+<h3 id="sec-5-2"><span class="section-number-3">5.2</span> producer and consumer</h3>
+<div class="outline-text-3" id="text-5-2">
+
+
+
+
+
+<pre class="src src-c++"><span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">producer</span>(<span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">n</span>, <span style="color: #66D9EF;">int</span> *<span style="color: #FD971F;">x</span>, <span style="color: #66D9EF;">continuation</span> &amp; <span style="color: #FD971F;">cont</span>) {
+  <span style="color: #F92672;">for</span> (<span style="color: #66D9EF;">int</span> <span style="color: #FD971F;">i</span> = 0; i &lt; n; ++i) {
+    *x = i * i;
+    cont.swap();
+  }
+}
+
+<span style="color: #66D9EF;">void</span> <span style="color: #A6E22E;">consumer</span>(<span style="color: #66D9EF;">int</span> <span style="color: #F92672;">volatile</span> *<span style="color: #FD971F;">x</span>, <span style="color: #66D9EF;">continuation</span> &amp;<span style="color: #FD971F;">cont</span>) {
+  <span style="color: #F92672;">while</span> (cont.swap() &gt; 0) {
+    CLOG(INFO, <span style="color: #E6DB74;">"got"</span>, *x);
+  }
+}
+</pre>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<div style='clear:both;margin-top:20px'></div><hr /><div style='float:right;font-size:1.2em'><a href='mailto:changsheng@weizi.org'>Changsheng Jiang</a></div><div style='clear:both'></div>
+</div>
+</body>
+</html>
