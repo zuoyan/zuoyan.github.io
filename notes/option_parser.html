@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="title" content="Command Line Options Parser for C++, a state monad approach"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2013-07-07T23:54+0800"/>
+<meta name="generated" content="2013-07-07T23:57+0800"/>
 <meta name="author" content="Changsheng Jiang"/>
 <meta name="description" content=""/>
 <meta name="keywords" content=""/>
@@ -407,18 +407,18 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 <pre class="src src-c++">parser.add_option(
   <span style="color: #E6DB74;">"env-run"</span>, liftm(
      [](<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; <span style="color: #FD971F;">env</span>, <span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; <span style="color: #FD971F;">cmd_argv</span>) { ... },
-     <span style="color: #66D9EF;">state_many</span>&lt;<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; &gt;(<span style="color: #66D9EF;">pred_value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;()([](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">s</span>) { <span style="color: #F92672;">return</span> s.find(<span style="color: #E6DB74;">'='</span>) &lt; s.size(); })),
-     <span style="color: #66D9EF;">value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;() &gt;&gt;= [](<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">sep</span>) {
-       <span style="color: #F92672;">return</span> state_many&lt;<span style="color: #66D9EF;">vector</span>&lt;string&gt;(
-          liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) -&gt; <span style="color: #66D9EF;">maybe</span>&lt;string&gt; { v == sep ? nothing : just(v); },
-                <span style="color: #66D9EF;">value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;()));
+     state_many(pred_value()([](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">s</span>) { <span style="color: #F92672;">return</span> s.find(<span style="color: #E6DB74;">'='</span>) &lt; s.size(); })),
+     value() &gt;&gt;= [](<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">sep</span>) {
+       <span style="color: #F92672;">return</span> state_many(
+          liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) { <span style="color: #F92672;">return</span> v == sep ? nothing : just(v); },
+                value()));
      }), <span style="color: #E6DB74;">"[NAME=VALUE]* SEP CMD-ARG* SEP:: run command with environment"</span>);
 </pre>
 
 
 <p>
   Where <code>value</code> just returns a state monad <code>state -&gt; (T, state)</code>,
-  where <code>T</code> the value type.  <code>pred_value</code> returns a function, who
+  where <code>T</code> the value type(default <code>string</code> ).  <code>pred_value</code> returns a function, who
   takes a prediction and return a state monad, the monad function
   returns nothing(injected to state monad) if prediction return false
   on the value, otherwise, pass the value(wrap with maybe and injected
@@ -442,8 +442,8 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 <span style="color: #F92672;">auto</span> <span style="color: #A6E22E;">sep_container</span>() {
   <span style="color: #F92672;">return</span> [](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">sep</span>) {
      <span style="color: #F92672;">return</span> <span style="color: #66D9EF;">state_many</span>&lt;VS&gt;(
-        liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) -&gt; <span style="color: #66D9EF;">maybe</span>&lt;T&gt; { v == sep ? nothing : just(<span style="color: #66D9EF;">from_text</span>&lt;<span style="color: #66D9EF;">T</span>&gt;(<span style="color: #FD971F;">v</span>)); },
-              <span style="color: #66D9EF;">value</span>&lt;<span style="color: #66D9EF;">string</span>&gt;()));
+        liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) { <span style="color: #F92672;">return</span> v == sep ? nothing : just(<span style="color: #66D9EF;">from_text</span>&lt;<span style="color: #66D9EF;">T</span>&gt;(<span style="color: #FD971F;">v</span>)); },
+              value()));
   };
 }
 </pre>
