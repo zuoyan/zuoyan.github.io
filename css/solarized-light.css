@@ -141,11 +141,16 @@ h6 {
 }
 
 .marginnote {
-  background-color: #eee8d5;
   color: #657b83;
   border: 2pt #93a1a1 solid;
   border-radius: 1em;
   padding: 0 1em;
-  margin: 0 0 0 4em;
+  margin: 0 0 0 5em;
   box-shadow: 5pt 5pt 8pt #eee8d5;
 }
+
+.marginnote:before {
+ content: "Note:";
+ color: #859900;
+ font-size: 1.15em;
+};
