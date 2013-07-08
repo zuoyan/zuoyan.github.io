@@ -150,7 +150,43 @@ h6 {
 }
 
 .marginnote:before {
- content: "Note:";
- color: #859900;
- font-size: 1.15em;
-};
+  content: "Note:";
+  color: #859900;
+  font-size: 1.15em;
+}
+
+@media screen {
+  #table-of-contents {
+    font-size: 80%;
+    padding: .5em;
+    margin: 1em 0em 1em 1em;
+    display: block;
+    float: right;
+    border: 1px solid #93a1a1;
+    border-radius: 1em;
+    max-width: 50%;
+    max-height: 80em;
+    overflow: auto;
+  }
+
+  #table-of-contents ul {
+    margin: 0em;
+    padding: 0 0 0 1em;
+  }
+
+  #table-of-contents li  {
+    margin: .2em 0 .2em 0;
+    list-style: none;
+    padding: 0;
+  }
+
+  #table-of-contents h2 {
+    margin-top: .2em;
+    font-size: 1.0em;
+  }
+}
+
+@media print {
+  #table-of-contents { display:none; }
+  #org-div-home-and-up { display:none; }
+}
