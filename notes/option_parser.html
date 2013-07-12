@@ -7,13 +7,13 @@
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="title" content="Command Line Options Parser for C++, a state monad approach"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2013-07-07T23:57+0800"/>
+<meta name="generated" content="2013-07-12T15:31+0800"/>
 <meta name="author" content="Changsheng Jiang"/>
 <meta name="description" content=""/>
 <meta name="keywords" content=""/>
 
 <link rel="stylesheet" href="../css/normalize.css" type="text/css" />
-<link rel="stylesheet" href="../css/solarized-light.css" type="text/css" />
+<link rel="stylesheet" href="../css/weizi.css" type="text/css" />
 <script type="text/javascript">
 /*
 @licstart  The following is the entire license notice for the
@@ -100,7 +100,7 @@ for the JavaScript code in this tag.
 
 
 <p>
-  There are too many command line options parser library.
+  There are too many command line options parser libraries.
 </p>
 <p>
   Here first we list some of them, and try to find a common pattern
@@ -363,7 +363,8 @@ parser.add_option(<span style="color: #E6DB74;">"f|flag"</span>, [&amp;]() {flag
 parser.add_option(<span style="color: #E6DB74;">"no-flag"</span>, [&amp;]() {flag = 0;}, <span style="color: #E6DB74;">"toggle flag off"</span>)
 parser.add_option(<span style="color: #E6DB74;">"x|x-value"</span>, &amp;x, <span style="color: #E6DB74;">"FLOAT::x value"</span>);
 parser.add_option(<span style="color: #E6DB74;">"y|y-value"</span>, &amp;y, <span style="color: #E6DB74;">"FLOAT::y value"</span>);
-parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">x_</span>, <span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">y_</span>) { x = x_; y = y_; }, <span style="color: #E6DB74;">"FLOAT FLOAT::x and y"</span>);
+parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">x_</span>, <span style="color: #66D9EF;">double</span> <span style="color: #FD971F;">y_</span>) {
+  x = x_; y = y_; }, <span style="color: #E6DB74;">"FLOAT FLOAT::x and y"</span>);
 </pre>
 
 
@@ -407,7 +408,8 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 <pre class="src src-c++">parser.add_option(
   <span style="color: #E6DB74;">"env-run"</span>, liftm(
      [](<span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; <span style="color: #FD971F;">env</span>, <span style="color: #66D9EF;">vector</span>&lt;<span style="color: #66D9EF;">string</span>&gt; <span style="color: #FD971F;">cmd_argv</span>) { ... },
-     state_many(pred_value()([](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">s</span>) { <span style="color: #F92672;">return</span> s.find(<span style="color: #E6DB74;">'='</span>) &lt; s.size(); })),
+     state_many(pred_value()([](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">s</span>) {
+       <span style="color: #F92672;">return</span> s.find(<span style="color: #E6DB74;">'='</span>) &lt; s.size(); })),
      value() &gt;&gt;= [](<span style="color: #F92672;">const</span> <span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">sep</span>) {
        <span style="color: #F92672;">return</span> state_many(
           liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) { <span style="color: #F92672;">return</span> v == sep ? nothing : just(v); },
@@ -418,11 +420,12 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 
 <p>
   Where <code>value</code> just returns a state monad <code>state -&gt; (T, state)</code>,
-  where <code>T</code> the value type(default <code>string</code> ).  <code>pred_value</code> returns a function, who
-  takes a prediction and return a state monad, the monad function
-  returns nothing(injected to state monad) if prediction return false
-  on the value, otherwise, pass the value(wrap with maybe and injected
-  to state monad), i.e. <code>(T -&gt; bool) -&gt; (state -&gt; (T, state))</code>.
+  where <code>T</code> the value type(default <code>string</code> ).  <code>pred_value</code> returns a
+  function, who takes a prediction and return a state monad, the monad
+  function returns nothing(injected to state monad with the state
+  before consumed) if prediction return false on the value, otherwise,
+  pass the value(wrap with maybe and injected to state monad),
+  i.e. <code>(T -&gt; bool) -&gt; (state -&gt; (T, state))</code>.
 </p>
 <p>
   If this variadic pattern is used very often, we can extract it as
@@ -442,8 +445,10 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 <span style="color: #F92672;">auto</span> <span style="color: #A6E22E;">sep_container</span>() {
   <span style="color: #F92672;">return</span> [](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">sep</span>) {
      <span style="color: #F92672;">return</span> <span style="color: #66D9EF;">state_many</span>&lt;VS&gt;(
-        liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) { <span style="color: #F92672;">return</span> v == sep ? nothing : just(<span style="color: #66D9EF;">from_text</span>&lt;<span style="color: #66D9EF;">T</span>&gt;(<span style="color: #FD971F;">v</span>)); },
-              value()));
+        liftm([sep](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">v</span>) {
+            <span style="color: #F92672;">return</span> v == sep ? nothing : just(<span style="color: #66D9EF;">from_text</span>&lt;<span style="color: #66D9EF;">T</span>&gt;(<span style="color: #FD971F;">v</span>));
+          },
+          value()));
   };
 }
 </pre>
@@ -459,7 +464,9 @@ parser.add_option(<span style="color: #E6DB74;">"xy"</span>, [&amp;](<span style
 
 
 <pre class="src src-c++">parser.add_option(
-  <span style="color: #E6DB74;">"load-plugin"</span>, [](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">name</span>) { dlopen(name.c_str(), ...); ...; }, <span style="color: #E6DB74;">"FILE::plugin file"</span>);
+  <span style="color: #E6DB74;">"load-plugin"</span>, [](<span style="color: #66D9EF;">string</span> <span style="color: #FD971F;">name</span>) {
+       dlopen(name.c_str(), ...); ...;
+     }, <span style="color: #E6DB74;">"FILE::plugin file"</span>);
 </pre>
 
 
