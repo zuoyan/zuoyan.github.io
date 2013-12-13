@@ -1,0 +1,150 @@
+<html>
+  <head>
+    <title>Encrypt/Descrypt with a peer based on github.com/digitalbazaar/forge</title>
+    <script>//forge = {disableNativeCode: true};</script>
+    <script src="js/util.js"></script>
+    <script src="js/aes.js"></script>
+    <script src="js/asn1.js"></script>
+    <script src="js/des.js"></script>
+    <script src="js/hmac.js"></script>
+    <script src="js/md5.js"></script>
+    <script src="js/pki.js"></script>
+    <script src="js/prng.js"></script>
+    <script src="js/rc2.js"></script>
+    <script src="js/jsbn.js"></script>
+    <script src="js/sha1.js"></script>
+    <script src="js/sha256.js"></script>
+    <script src="js/tls.js"></script>
+    <script src="js/random.js"></script>
+    <script src="js/rsa.js"></script>
+    <script src="js/forge.js"></script>
+  </head>
+<body>
+  <h1>Encryp/Decrypt with a peer</h1>
+  <span style="display:inline-block; width:15%;">local public key:</span><input id="local-pubkey" disabled=true />   <a href="javascript:generate_local_key()" title="click this once and send the local public key to peers">Generate Local Private/Public Key</a> <br/>
+  <span style="display:inline-block; width:15%;">peer public key:</span><input id="peer-pubkey" title="Ask & Copy peer's public key here" /> <br/>
+
+  <br />
+
+  <span style="display:inline-block;width:15%;">Input:</span>
+  <textarea id="input-text" rows="20", cols="100"></textarea>
+
+  <br />
+  <span style="display:inline-block; width:15%;"></span>
+  <a href="javascript:do_peer_encrypt()" title="After entering text in Input box, click me and send the text in Output to the peer">Encrypt for Peer</a> |
+  <a href="javascript:do_local_decrypt()" title="After entering message received from peer in Input, click me to see the plain message">Decrypt</a>
+
+  <br />
+
+  <span style="display:inline-block;width:15%;">Output:</span>
+  <textarea id="output-text" rows="20", cols="100"></textarea>
+<script>
+var rsa = forge.pki.rsa;
+var local_prikey;
+var local_pubkey;
+var peer_pubkey;
+
+(function () {
+  var s = localStorage.getItem("local-prikey");
+  if (!s) return;
+  var nums = s.split(":");
+  for (var i = 0; i < nums.length; ++i) {
+   var x = new forge.jsbn.BigInteger();
+   x.fromRadix(nums[i]);
+   nums[i] = x
+  }
+  var n, e, d, p, q, dP, dQ, qInv;
+  n = nums[0];
+  e = nums[1];
+  d = nums[2];
+  p = nums[3];
+  q = nums[4];
+  dP = nums[5];
+  dQ = nums[6];
+  qInv = nums[7];
+  local_prikey = rsa.setPrivateKey(n, e, d, p, q, dP, dQ, qInv)
+  local_pubkey = rsa.setPrivateKey(n, e)
+  document.getElementById("local-pubkey").value = n.toString() + ":" + e.toString();
+})();
+
+(function () {
+  document.getElementById("peer-pubkey").onchange = function() {
+                      localStorage.setItem("peer-pubkey", document.getElementById("peer-pubkey").value);
+                      };
+  var s = localStorage.getItem("peer-pubkey");
+  if (!s) return;
+  var nums = s.split(":");
+  for (var i = 0; i < nums.length; ++i) {
+   var x = new forge.jsbn.BigInteger();
+   x.fromRadix(nums[i]);
+   nums[i] = x
+  }
+  var n, e;
+  n = nums[0];
+  e = nums[1];
+  peer_pubkey = rsa.setPublicKey(n, e)
+  document.getElementById("peer-pubkey").value = n.toString() + ":" + e.toString();
+})();
+
+function generate_local_key() {
+   var keypair = rsa.generateKeyPair({bits: 2048, e: 0x10001});
+   local_prikey = keypair.privateKey;
+   local_pubkey = keypair.publicKey;
+   var n = local_prikey.n;
+   var e = local_prikey.e;
+   document.getElementById("local-pubkey").value = n.toString() + ":" + e.toString();
+   var d = local_prikey.d;
+   var p = local_prikey.p;
+   var q = local_prikey.q;
+   var dP = local_prikey.dP;
+   var dQ = local_prikey.dQ;
+   var qInv = local_prikey.qInv;
+   var nums = [n, e, d, p, q, dP, dQ, qInv];
+   var s = nums.join(":");
+   localStorage.setItem("local-prikey", s)
+}
+
+function do_encrypt(pubkey, plain) {
+  var k = Math.ceil(pubkey.n.bitLength() / 8);
+  var encrypted = ""
+  for (var i = 0; i < plain.length; i += k - 11) {// >
+    var l = k - 11;
+    if (i + l >= plain.length) l = plain.length - i;
+    encrypted += peer_pubkey.encrypt(plain.substring(i, i + l))
+  }
+  return encrypted;
+}
+
+function do_peer_encrypt() {
+  var ne = document.getElementById("peer-pubkey").value.split(":")
+  var n = new forge.jsbn.BigInteger();
+  var e = new forge.jsbn.BigInteger();
+  n.fromRadix(ne[0], 10);
+  e.fromRadix(ne[1], 10);
+  console.log("n=", n);
+  console.log("e=", e);
+  peer_pubkey = rsa.setPublicKey(n, e);
+  var plain = document.getElementById("input-text").value;
+  var encrypted = do_encrypt(peer_pubkey, plain);
+  document.getElementById("output-text").value = forge.util.encode64(encrypted);
+}
+
+function do_local_encrypt() {
+  var plain = document.getElementById("input-text").value;
+  var encrypted = do_encrypt(keypair.publicKey, plain);
+  document.getElementById("output-text").value = forge.util.encode64(encrypted);
+}
+
+function do_local_decrypt() {
+  var encrypted = forge.util.decode64(document.getElementById("input-text").value);
+  var k = Math.ceil(local_prikey.n.bitLength() / 8)
+  var plain = ""
+  for (var i = 0; i < encrypted.length; i += k) { // >
+    plain += local_prikey.decrypt(encrypted.substring(i, i + k));
+  }
+  document.getElementById("output-text").value = plain;
+}
+
+</script>
+</body>
+</html>
