@@ -1,42 +1,107 @@
 @import url(http://fonts.googleapis.com/css?family=Droid+Serif|Open+Sans|Coming+Soon);
+
 @media screen {
   html {
-    font-family: "Open Sans", Calibri, "Lucida Grande", "Lucida Sans", Verdana, sans-serif; } }
+    font-family: "Open Sans", Calibri, "Lucida Grande", "Lucida Sans", Verdana, sans-serif;
+  }
+}
+
 @media print {
   html {
-    font-family: "Droid Serif", Algegrea, Cambria, Georgia, "Times New Roman", Times, serif; } }
+    font-family: "Droid Serif", Algegrea, Cambria, Georgia, "Times New Roman", Times, serif;
+  }
+}
+
 pre, code {
-  font-family: "Courier New", Courier, monospace; }
+  font-family: "Courier New", Courier, monospace;
+}
 
 h1, h2, h3, h4, h5, h6 {
   font-family: "Open Sans", sans-serif;
-  font-weight: 700; }
+  font-weight: 700;
+}
 
 html {
   background-color: #fdf6e3;
   color: #657b83;
-  margin: 1em; }
+  margin: 1em;
+  line-height: 120%;
+}
+
+h1 {
+  color: #d33682;
+}
+
+h2, h3, h4, h5, h6 {
+  color: #859900;
+}
+
+h1 {
+  font-size: 2.8em;
+}
+
+h2 {
+  font-size: 2.4em;
+}
+
+h3 {
+  font-size: 1.8em;
+}
+
+h4 {
+  font-size: 1.4em;
+}
+
+h5 {
+  font-size: 1.3em;
+}
+
+h6 {
+  font-size: 1.15em;
+}
 
 code {
   background-color: #eee8d5;
-  padding: 2px; }
+  padding: 2px;
+}
 
 a {
-  color: #b58900; }
+  color: #b58900;
+}
 
 a:visited {
-  color: #cb4b16; }
+  color: #cb4b16;
+}
 
 a:hover {
-  color: #cb4b16; }
+  color: #cb4b16;
+}
 
-h1 {
-  color: #d33682; }
+tr:not(:first-child) {
+    border-top: #93a1a1 dotted 1pt;
+}
 
-h2, h3, h4, h5, h6 {
-  color: #859900; }
+td:not(:first-child), th:not(:first-child) {
+  border-left: #93a1a1 dotted 1pt;
+}
 
-pre {
+td, th {
+  padding: 0.2em;
+}
+
+td {
+ font-size: 0.8em;
+}
+
+th {
+ font-size: 0.9em;
+}
+
+table {
+  margin-top: 1em;
+}
+
+pre.src, pre.example {
   background-color: #fdf6e3;
   color: #657b83;
   border: 1pt solid #93a1a1;
@@ -45,9 +110,15 @@ pre {
   box-shadow: 5pt 5pt 8pt #eee8d5;
   overflow: auto;
   white-space: pre;
-  word-wrap: normal; }
-  pre code {
-    background-color: #fdf6e3; }
+  word-wrap: normal;
+  max-height: 40ex;
+  overflow: auto;
+  font-size: 0.8em;
+}
+
+pre code {
+ background-color: #fdf6e3;
+}
 
 pre::-webkit-scrollbar {
   height: 7px;
@@ -58,24 +129,6 @@ pre::-webkit-scrollbar-thumb {
   background-color: #93a1a1;
   border-radius: 4px;
   box-shadow: 0 0 1px #93a1a1; }
-
-h1 {
-  font-size: 2.8em; }
-
-h2 {
-  font-size: 2.4em; }
-
-h3 {
-  font-size: 1.8em; }
-
-h4 {
-  font-size: 1.4em; }
-
-h5 {
-  font-size: 1.3em; }
-
-h6 {
-  font-size: 1.15em; }
 
 .tag {
   background-color: #eee8d5;
@@ -133,36 +186,69 @@ h6 {
 .marginnote:before {
   content: "Note:";
   color: #859900;
-  font-size: 1.15em; }
+  font-size: 1.15em;
+}
+
+.chart {
+  margin: 10pt 0pt;
+}
 
 @media screen {
   #table-of-contents {
     font-size: 80%;
     padding: .5em;
     margin: 1em 0em 1em 1em;
-    overflow: auto; }
+    overflow: auto;
+  }
 
   #table-of-contents ul {
     margin: 0em;
-    padding: 0 0 0 1em; }
+    padding: 0 0 0 1em;
+  }
 
   #table-of-contents li {
     margin: .2em 0 .2em 0;
     list-style: none;
-    padding: 0; }
+    padding: 0;
+  }
 
   #table-of-contents h2 {
     margin-top: .2em;
-    font-size: 1.0em; } }
+    font-size: 1.0em;
+  }
+}
+
 @media screen and (min-width: 400px) {
   #table-of-contents {
     float: right;
     display: block;
     border: 1px solid #93a1a1;
-    border-radius: 1em; } }
+    border-radius: 1em;
+  }
+}
+
 @media print {
   #table-of-contents {
-    display: none; }
+    display: none;
+  }
 
   #org-div-home-and-up {
-    display: none; } }
+    display: none;
+  }
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+.axis text {
+  font-family: sans-serif;
+  font-size: 11px;
+}
+
+.grid .tick, .grid line {
+  stroke: lightgrey;
+  opacity: 0.7;
+}
