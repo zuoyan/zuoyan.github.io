@@ -18,11 +18,9 @@ a:hover{color:#cb4b16}
 tr:not(:first-child){border-top:#586e75 dotted 1px}
 td:not(:first-child),th:not(:first-child){border-left:#586e75 dotted 1px}
 td,th{padding:.2em}
-td{font-size:.8em}
-th{font-size:.9em}
 table{margin-top:1em}
-pre.src,pre.example{background:#eee8d5;border:1px solid #eee8d5;-webkit-border-radius:.5em;-moz-border-radius:.5em;border-radius:.5em;padding:1em;white-space:pre;word-wrap:normal;overflow:auto;font-size:.8em}
-@media screen{pre.src,pre.example{max-height:40ex}}pre code{background-color:#eee8d5}
+pre.src,pre.example{background:#eee8d5;border:1px solid #eee8d5;-webkit-border-radius:.5em;-moz-border-radius:.5em;border-radius:.5em;padding:.5em;overflow:auto;white-space:pre;word-wrap:normal;overflow:auto}
+@media screen{pre.src,pre.example{max-height:80ex}}pre code{background-color:#eee8d5}
 pre::-webkit-scrollbar{height:5px;-webkit-appearance:none;width:5px}
 pre::-webkit-resizer{display:none}
 pre::-webkit-scrollbar-corner{display:none}
@@ -39,6 +37,6 @@ pre::-webkit-scrollbar-thumb{-webkit-border-radius:4px;-moz-border-radius:4px;bo
 .marginnote{color:#839496;-webkit-border-radius:1em;-moz-border-radius:1em;border-radius:1em;border:2px #586e75 solid;padding:0 1em;margin:0 0 0 10%;-webkit-box-shadow:5px 0 5px #073642;-moz-box-shadow:5px 0 5px #073642;box-shadow:5px 0 5px #073642}
 .marginnote:before{content:"Note:";color:#859900;font-size:1.15em}
 .chart{margin:10px 0}
-@media screen{#table-of-contents{font-size:80%;max-height:80ex;padding:.5em;margin:1em;overflow:auto;border:1px dotted #eee8d5;background-color:#eee8d5;-webkit-border-radius:1em;-moz-border-radius:1em;border-radius:1em;-webkit-box-shadow:1em 0 1em #93a1a1;-moz-box-shadow:1em 0 1em #93a1a1;box-shadow:1em 0 1em #93a1a1} #table-of-contents ul{margin:0;padding:0 0 0 1em} #table-of-contents li{margin:.2em 0 .2em 0;list-style:none;padding:0} #table-of-contents h2{margin-top:.2em;font-size:1em}}@media print{#table-of-contents{display:none} #org-div-home-and-up{display:none}}.axis path,.axis line{fill:none;stroke:#000;shape-rendering:crispEdges}
+@media screen{#table-of-contents a:link{text-decoration:none} #table-of-contents{font-size:80%;max-height:800ex;padding:.5em;margin:1em;overflow:auto;border:1px dotted #eee8d5;background-color:#eee8d5;-webkit-border-radius:1em;-moz-border-radius:1em;border-radius:1em;-webkit-box-shadow:.1em .1em .1em #93a1a1;-moz-box-shadow:.1em .1em .1em #93a1a1;box-shadow:.1em .1em .1em #93a1a1} #table-of-contents ul{margin:0;padding:0 0 0 1em} #table-of-contents li{margin:.2em 0 .2em 0;list-style:none;padding:0} #table-of-contents h2{font-size:1em;font-family:"Arial Black","Arial Bold",Gadget,sans-serif}}@media screen and (min-width:1000px){#table-of-contents{position:fixed;right:0;top:0;max-height:80%;max-width:50%;overflow:auto;z-index:1;-webkit-box-shadow:.1em .1em 3em #93a1a1;-moz-box-shadow:.1em .1em 3em #93a1a1;box-shadow:.1em .1em 3em #93a1a1} #table-of-contents #text-table-of-contents{display:none;text-align:left} #table-of-contents:hover #text-table-of-contents{display:block}}@media print{#table-of-contents{display:none} #org-div-home-and-up{display:none}}.axis path,.axis line{fill:none;stroke:#000;shape-rendering:crispEdges}
 .axis text{font-size:11px}
 .grid .tick,.grid line{stroke:#d3d3d3;opacity:.7}
