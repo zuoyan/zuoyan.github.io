@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Message Algorithms</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="title" content="Message Algorithms"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2013-07-12T15:31+0800"/>
+<meta name="author" content="Changsheng Jiang"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+
+<link rel="stylesheet" href="../css/normalize.css" type="text/css" />
+<link rel="stylesheet" href="../css/weizi.css" type="text/css" />
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012  Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js">
+<!--/*--><![CDATA[/*><!--*/
+    MathJax.Hub.Config({
+        // Only one of the two following lines, depending on user settings
+        // First allows browser-native MathML display, second forces HTML/CSS
+        //  config: ["MMLorHTML.js"], jax: ["input/TeX"],
+            jax: ["input/TeX", "output/HTML-CSS"],
+        extensions: ["tex2jax.js","TeX/AMSmath.js","TeX/AMSsymbols.js",
+                     "TeX/noUndefined.js"],
+        tex2jax: {
+            inlineMath: [ ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"], ["\\begin{displaymath}","\\end{displaymath}"] ],
+            skipTags: ["script","noscript","style","textarea","pre","code"],
+            ignoreClass: "tex2jax_ignore",
+            processEscapes: false,
+            processEnvironments: true,
+            preview: "TeX"
+        },
+        showProcessingMessages: true,
+        displayAlign: "center",
+        displayIndent: "2em",
+
+        "HTML-CSS": {
+             scale: 100,
+             availableFonts: ["STIX","TeX"],
+             preferredFont: "TeX",
+             webFont: "TeX",
+             imageFont: "TeX",
+             showMathMenu: true,
+        },
+        MMLorHTML: {
+             prefer: {
+                 MSIE:    "MML",
+                 Firefox: "MML",
+                 Opera:   "HTML",
+                 other:   "HTML"
+             }
+        }
+    });
+    MathJax.Hub.Register.StartupHook(
+       "HTML-CSS Jax Ready", function () {
+           MathJax.OutputJax["HTML-CSS"].Font.checkWebFont = function (check,font,callback) {
+              callback(check.STATUS.OK);
+            };
+    });
+    MathJax.Hub.Configured();
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="org-div-home-and-up" style="text-align:right;font-size:70%;white-space:nowrap;">
+ <a accesskey="h" href="./"> UP </a>
+ |
+ <a accesskey="H" href="../"> HOME </a>
+</div>
+
+<div id="preamble">
+
+</div>
+
+<div id="content">
+<h1 class="title">Message Algorithms</h1>
+
+
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1 Cost Model</a></li>
+<li><a href="#sec-2">2 Broadcast</a>
+<ul>
+<li><a href="#sec-2-1">2.1 Flat</a></li>
+<li><a href="#sec-2-2">2.2 Binomial Tree</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Cost Model</h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+  We use a simplified <a href="http://en.wikipedia.org/wiki/LogP_machine">LogP</a> model. Just latency \(\alpha\) and bandwidth
+  \(\beta\). The overhead introduced by implementation is plused to the
+  latency.
+</p>
+<p>
+  We assume the machines are all connected and at every machine, the
+  in/out bandwidth and latency are independent. Every machine can send
+  and recv data simultaneously in full bandwidth. But from one
+  machine, the totaly bandwidth is bounded independent number of
+  peers.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Broadcast</h2>
+<div class="outline-text-2" id="text-2">
+
+
+<p>
+  One(called root) send a message, and all others in the same group
+  will receive the same message.
+</p>
+
+</div>
+
+<div id="outline-container-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Flat</h3>
+<div class="outline-text-3" id="text-2-1">
+
+
+<p>
+   In flat algorithms, root send the messages to others one by
+   one. For every peer, the root needs \(\alpha + m\beta\) time to send
+   the message, where \(m\) is the size of the message. There are \(P -
+   1\) peers, so the total time required is \((\alpha + m \beta)(P -
+   1)\).
+</p>
+
+
+
+
+<div class="figure">
+<p><img src="./flat.png"  alt="./flat.png" /></p>
+<p>broadcast in flat</p>
+</div>
+
+</div>
+
+</div>
+
+<div id="outline-container-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Binomial Tree</h3>
+<div class="outline-text-3" id="text-2-2">
+
+
+<p>
+   Flat algorithms is slow, because most of processors are waiting,
+   and no one helps the root. Every processor who received message can
+   send the message to others. The binomial tree algorithms split the
+</p>
+
+
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    var disqus_shortname = 'weizi'; // required: replace example with your forum shortname
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+
+</div>
+</div>
+</div>
+</div>
+
+<div id="postamble">
+<div style='clear:both;margin-top:20px'></div><hr /><div style='float:right;font-size:1.2em'><a href='mailto:changsheng@weizi.org'>Changsheng Jiang</a></div><div style='clear:both'></div>
+</div>
+</body>
+</html>
