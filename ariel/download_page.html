@@ -65,11 +65,71 @@ python -m SimpleHTTPServer 8128</pre>
           <h1>Downloading Client</h1>
 
 <pre>
-import urlib.request
+import urllib.request
 
-def Download(url, filename):
-  """Download url and write its content to filename."""
+def Download(url):
+  """Download url and return its content."""
+  fp = urllib.request.urlopen(url)
+  return fp.read();
+
+
+def DownloadToFile(url, filename):
+  """Download url and write its content to a file."""
+  wfp = open(filename, "wb")
+  wfp.write(Download(url))
 </pre>
+
+<p>To verify it, we can verify it through token:</p>
+
+<pre>
+assert ("Download url and write its content"
+         in Download("http://note.weizi.org/ariel/download_page.html"))
+</pre>
+
+There are some servers who may return different content to different clients. A
+client can tell servers its type through HTTP request Header, <code>User-Agent</code>. We
+can config our client to tell server it is a real browser.
+
+<pre>
+def DownloadAs(url, user_agent):
+  """Download url and return its content, request with user_agent."""
+  request = urllib.request.Request(
+    url, None, {
+      "User-Agent" :
+         "Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11"
+    }
+  )
+  fp = urllib.request.urlopen(request)
+  return fp.read();
+</pre>
+
+<p>To verify the user agent, we can use a some server which list the client user agent:</p>
+
+<pre>
+url = "http://www.useragentstring.com/"
+default = Download(url)
+chrome_ua = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.43 Safari/537.36"
+chrome = DownloadAs(url, chrome_ua)
+assert chrome_ua in chrome
+assert not chrome_ua in default
+# # print them if you want to check.
+# print("===============Default===============\n", default)
+# print("===============Chrome================\n", chrome)
+</pre>
+
+<h1>Problems</h1>
+<div>
+  <p><span class="label label-default">Problem 1</span>The arguments after the
+    python script can be accessed through <code>sys.argv</code>, please write a python file:</p>
+<pre>
+import sys
+print(sys.argv)
+</pre>
+
+<p>And then use it with different/random arguments to learn sys.argv.</p>
+</div>
+
+<p><span class="label label-default">Problem 2</span> Write a simple command line program which accepts two argument, the url and the filename, download the url and write its content to the file.</p>
 
         </div>
         <div class="col-md-3">
