@@ -135,9 +135,11 @@ var optimization = new function() {
         continue;
       }
       if (deferred) {
-        deferred = deferred.then(function() {
-          return LoadScript(url);
-        });
+        deferred = deferred.then((function(url) {
+          return function() {
+            return LoadScript(url);
+          };
+        })(url));
       } else {
         deferred = LoadScript(url);
       }
