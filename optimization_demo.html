@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <title>Online Optimization</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title" content="Some Scope of Changsheng Jiang"/>
+  <meta name="author" content="Changsheng Jiang"/>
+  <meta name="description" content="Some Scope of weizi"/>
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+  <script src="optimization_demo.js"></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#weizi-navbar">
+            <span class="sr-only">Navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Weizi</a>
+        </div>
+        <div class="collapse navbar-collapse" id="weizi-navbar">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="/">Home <span class="sr-only">(current)</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <h1 class="title">Optimization Demo</h1>
+      <div class="row">
+        <div class="col-md-3">
+          <nav class="affix">
+            <ul class="nav">
+              <li><a href="#Config">Config</a></li>
+              <li><a href="#Log">Log</a></li>
+              <li><a href="#Document">Document</a>
+                <ul class="nav">
+                  <li><a href="#doc-start-point">Start Point</a></li>
+                  <li><a href="#doc-target-function">Target Function</a></li>
+                  <li><a href="#doc-gradient">Gradient</a></li>
+                  <li><a href="#doc-solver">Solving Algorithm</a></li>
+                </ul>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="col-md-9">
+          <embed id="optimization_nacl" width="0" height="0" src="optimization_demo.nmf" type="application/x-pnacl" />
+          <h1 id="Config">Config</h1>
+
+          <p>You can define your problem in JavaScript and paste the url or code
+            in the following area, then click the <em>Minimize</em> button,
+            the minimzed point of defined function will be found.</p>
+
+          <form class="form" action="javascript:optimization.UIMinimize()">
+            <div class="form-group">
+              <label>JavaScript URLs</label>
+              <textarea placeholder="URL lines" id="optimization_urls" class="form-control" rows="6" ></textarea>
+            </div>
+            <div class="form-group">
+              <label>JavaScript Code</label>
+              <textarea placeholder="JavaScript code" id="optimization_code" class="form-control" rows="6"></textarea>
+            </div>
+            <button type="submit" class="btn btn-default">Minimize</button>
+          </form>
+
+          <h1 id="Log">Log</h1>
+          <div id="optimization_log"><p>Optimization log and result will be showed here.</p></div>
+
+          <div id="Document">
+            <h1>Simple API of JavaScript</h1>
+
+            <p>The JavaScript will be evaluated with jQuery available. Please define
+              optimization.func, optimization.grad, etc in that JavaScript code.</p>
+
+            <p>You can follow <a href="https://gist.github.com/zuoyan/81b1b5ab764efe5d9112">an example in this gist</a>, and paste the <a href="https://gist.githubusercontent.com/zuoyan/81b1b5ab764efe5d9112/raw/5a92f3f10acb1dea73f409026a4185b5235f2c97/optimization.js">RAW url</a> in
+            the URLs input area, or, paste the JavaScript code directly in the
+            code area.</p>
+
+            <h2 id="doc-start-point">Start Point</h2>
+            The start point should be specified through <code>optimization.start</code>. For example,
+            <pre>
+optimization.start = [2, 2];</pre>
+
+            <h2 id="doc-target-function">Target Function</h2>
+            The target function, whose minimization we want to find can be specified by <code>optimization.func</code>. For example,
+            <pre>
+optimization.func = function(p) {
+  return .5 * Math.pow(1 - p[0], 2) + Math.pow(p[1] - p[0]*p[0], 2);
+};</pre>
+
+            <h2 id="doc-gradient">Gradient</h2>
+            The gradient of the target function should be specified through <code>optimization.grad</code>, like:
+            <pre>
+optimization.grad = function (p) {
+  return [(p[0] - 1) + 2 * (p[0]*p[0] - p[1]) * 2 * p[0], 2 * (p[1] - p[0] * p[0])];
+};</pre>
+
+            <h2 id="doc-solver">Solving Algorithm</h2>
+            <p>The solving algorithm should be specfied through <code>optimization.solver</code>. Currently,
+              only three gradient solvers have been adapted, they are <code>LmBFGSSolver</code>, <code>ConjugateGradientSolver</code> and <code>GradientDescentSolver</code>.</p>
+
+            <p>TODO: Add some global searching optimization algorithms.</p>
+          </div>
+        </div>
+      </div>
+  </body>
+</html>
