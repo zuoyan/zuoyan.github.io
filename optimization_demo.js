@@ -4,6 +4,14 @@ var optimization = new function() {
   var module_node = null;
   var log_node = null;
 
+  this.func = null;
+  this.grad = null;
+  this.start = null;
+  this.solver = null;
+  this.data_url = null;
+  this.deferred = null;
+  this.on_optimized = null;
+
   function PostJson(obj) {
     if (typeof obj != "string") {
       obj = JSON.stringify(obj);
@@ -24,11 +32,11 @@ var optimization = new function() {
   function Log(o) {
     if (o.path == "trace") {
       if (o.from == "value") {
-        // SimpleLog("At: " + JSON.stringify(o.point) + " Value: " + JSON.stringify(o.result));
+        SimpleLog("At: " + JSON.stringify(o.point) + " Value: " + JSON.stringify(o.result));
         return;
       }
       if (o.from == "gradient") {
-        // SimpleLog("At: " + JSON.stringify(o.point) + " Gradient: " + JSON.stringify(o.result));
+        SimpleLog("At: " + JSON.stringify(o.point) + " Gradient: " + JSON.stringify(o.result));
         return;
       }
       if (o.from == "log") {
@@ -40,16 +48,17 @@ var optimization = new function() {
     }
     if (o.path == "optimized") {
       SimpleLog("Minimize " + o.value + " at " + JSON.stringify(o.point));
+      self.value = o.value;
+      self.point = o.point;
+      if (self.on_optimized) {
+        var func = self.on_optimized;
+        self.on_optimized = null;
+        func();
+      }
       return;
     }
     SimpleLog(JSON.stringify(o));
   }
-
-  this.func = null;
-  this.grad = null;
-  this.start = null;
-  this.solver = null;
-  this.data_url = null;
 
   function OnOptimizationMessage(message) {
     var o = JSON.parse(message.data);
@@ -66,8 +75,7 @@ var optimization = new function() {
   }
 
   function PostOptimize() {
-    if ($.isFunction(optimization.func)
-        && $.isFunction(optimization.grad)) {
+    if ($.isFunction(optimization.func) && $.isFunction(optimization.grad)) {
       SimpleLog("Optimize ...");
       var message = {"path": "optimize",
                      "solver": self.solver,
@@ -104,6 +112,12 @@ var optimization = new function() {
       ErrorLog("Evaluate code block got error:" + error);
       return;
     }
+    if (self.deferred) {
+      var deferred = self.deferred;
+      self.deferred = null;
+      deferred.then(Optimize);
+      return;
+    }
     PostOptimize();
   }
 
@@ -114,15 +128,25 @@ var optimization = new function() {
   this.UIMinimize = function() {
     log_node.html("");
     var lines = $("#optimization_urls").val().split(/\n/);
-    var deferreds = [];
+    var deferred = null;
     for (var index = 0; index < lines.length; index += 1) {
       var url = lines[index];
       if (!url.length) {
         continue;
       }
-      deferreds.push(LoadScript(url));
+      if (deferred) {
+        deferred = deferred.then(function() {
+          return LoadScript(url);
+        });
+      } else {
+        deferred = LoadScript(url);
+      }
     }
-    $.when.apply($, deferreds).then(Optimize);
+    if (deferred) {
+      deferred.then(Optimize);
+    } else {
+      Optimize();
+    }
   };
 
   this.OnReady = function () {
@@ -130,6 +154,8 @@ var optimization = new function() {
     module_node = $("#optimization_nacl");
     module_node.ready(Init);
   };
+
+  this.SimpleLog = SimpleLog;
 };
 
 $(optimization.OnReady);
