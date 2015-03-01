@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Tutorial, Fibnacci</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#weizi-navbar">
+            <span class="sr-only">Navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Weizi</a>
+        </div>
+        <div class="collapse navbar-collapse" id="weizi-navbar">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li class="active"><a href="index.html">Tutorial for Ariel <span class="sr-only">(current)</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9">
+          <h1>Tutorial, Fibnacci</h1>
+          <span class="label label-default">2015-02-05</span>
+          <p>In this tutorial, we compare two version of Fibnacci sequence, to
+            demo recursion and memorization. Please also pay attention to the
+            analysis of complexity.</p>
+
+          <h1>Fibancci Sequence</h1>
+          <p>Fibnacci sequence is a very famous number sequence, which was first introduced
+            by Leonardo Fibnacci in considering the growth of rabbits population in a
+            ideal model. Fibnacci assumes that a pair of rabbits elder than 1 months gives
+            a new pair of rabbits every month, and rabbits never die. The number of
+            rabbits pairs in n-th month start from one pair of newly born rabbits is the
+            so called n-th Fibnacci number, denoted by F(n). It's easy to get:</p>
+
+          $$F(1) = 1, F(2) = 1, F(3) = 2, F(4) = 3.$$
+
+          <p>Generally, the rabbit pairs in n-th month equal to the rabbit pairs in \((n -
+            1)\)-th month plus the newly born rabbit pairs. The newly born rabbit pairs in
+            n-th month equal to the rabbit pairs in (n - 2)-th month, so we have:</p>
+
+          $$F(n) = F(n - 1) + F(n - 2).$$
+
+          <p>As above formula, we can define F(n) on zero and negaitve numbers as:</p>
+
+          $$F(n) = F(n + 2) - F(n + 1).$$
+
+          <p>With this extension, it can be proved that \(F(-n) = -F(n)\). But this
+            tutorial, we only consider \(F(0) = 1\) and positive numbers.</p>
+
+          <h1>Recursive Version</h1>
+          <p>According to this forumla, it is very easy to calculate n-th
+            Fibnacci number:</p>
+          <pre>
+def RecursiveFibnacci(n):
+  """Returns n-th Fibnacci number.
+
+  >>> RecursiveFibnacci(0)
+  0
+
+  >>> RecursiveFibnacci(1)
+  1
+
+  >>> RecursiveFibnacci(10)
+  55
+  """
+  assert isinstance(n, int)
+  assert n >= 0
+  if n == 0 or n == 1:
+    return n
+  return RecursiveFibnacci(n - 1) + RecursiveFibnacci(n - 2)</pre>
+
+          <p>We can check several small fibnacci numbers:</p>
+
+          <pre>
+print([(i, RecursiveFibnacci(i)) for i in range(11)])</pre>
+
+
+          <p>RecursiveFibnacci calls itself, this is a classical *recusive* function. A
+            function is called recursive if it calls itself directly or indirectly. To
+            avoid infinite loop, we must have a break condition in a recursive
+            function. In RecursiveFibnacci, we have special check for n is 0 and 1. Any
+            other n will call RecursiveFibnacci with smaller value and finally gets 1 or
+            0. This call stack for n = 3 is like following:</p>
+
+          <pre>
+RecursiveFibnacci(3) => RecursiveFibnacci(2) + RecursiveFibnacci(1)
+RecursiveFibnacci(2) => RecursiveFibnacci(1) + RecursiveFibnacci(0)</pre>
+
+
+          <p>The call stack for \(n = 5\) is like following:</p>
+          <pre>
+               5
+              / \
+             /   \
+            /     3
+           /     / \
+          4     2   1
+         / \   / \
+        /   \ 1   0
+       /     \
+      3       2
+     / \     / \
+    2   1   1   0
+   / \
+  1   0
+</pre>
+
+          <p>As you may already know, the call stacks are duplicated a lot for
+            large n. That is, a lot of Fibnacci numbers are calculated again and
+            again. We can calculate the times of RecursiveFibnacci called. Let
+            the times be R(n), then it is easy to get that:</p>
+
+          $$R(0) = R(1) = 1,$$
+
+          $$R(n) = R(n - 1) + R(n - 2) + 1.$$
+
+          <p>We can calculate manually \(R(2) = 3, R(3) = 5, R(4) = 9, R(5) =
+            15, R(6) = 25.\) But what is the value of R(100)?  That is
+            1146295688027634168201. This means even if we can call
+            RecursiveFibnacci once in 1 nano second, to finish <code>RecursiveFibnacci(100)</code>,
+            we need about 36323 years.</p>
+
+          <h1>Memorization Version</h1>
+
+          <p>We have to find another quicker way to calculate fibnacci numbers. A simple
+            and common way to avoid duplicated calculation is use memorization, i.e. we
+            remember all already calculated values.</p>
+
+          <pre>
+# kFibnacciNumbers is used to log all already calculated fibnacci numbers.
+kFibnacciNumbers = {0: 0, 1: 1}</pre>
+
+          <pre>
+def MemorizedFibnacci(n):
+  """Returns n-th Fibnacci number.
+
+  >>> MemorizedFibnacci(0)
+  0
+
+  >>> MemorizedFibnacci(1)
+  1
+
+  >>> MemorizedFibnacci(10)
+  55
+  """
+  assert isinstance(n, int)
+  assert n >= 0
+  if n in kFibnacciNumbers:
+    # n is already calculated, just retrieve it.
+    return kFibnacciNumbers[n]
+  v = MemorizedFibnacci(n - 1) + MemorizedFibnacci(n - 2)
+  # Store the value for reusing.
+  kFibnacciNumbers[n] = v
+  return v</pre>
+
+          <p>With this version, we can easily get Fibnacci numbers up to 100:</p>
+
+          <pre>
+print([(i, MemorizedFibnacci(i)) for i in range(100)])</pre>
+
+          <h1>Problems</h1>
+
+          <p><span class="label label-default">Problem 1</span> How many times <code>MemorizedFibnacci</code> will be called in
+            <code>MemorizedFibnacci(100)</code> at the first time? How many
+            times in the second time?</p>
+
+          <p><span class="label label-default">Problem 2</span> Implement \(R(n)\) and verify your implementation with \(R(100)\).</p>
+
+          <p><span class="label label-default">Problem 3</span> In Python,
+            <a href="https://docs.python.org/3.0/library/time.html">time</a> module
+            can be used to get the current time. Please use it to get some time
+            information for <code>RecursiveFibnacci</code> and verify that they
+            are in proportion with \(R(n)\).</p>
+        </div>
+        <div class="col-md-3">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

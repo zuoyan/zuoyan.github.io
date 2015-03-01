@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Tutorial, Download a Web Page</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#weizi-navbar">
+            <span class="sr-only">Navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Weizi</a>
+        </div>
+        <div class="collapse navbar-collapse" id="weizi-navbar">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li class="active"><a href="index.html">Tutorial for Ariel <span class="sr-only">(current)</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9">
+          <h1>Tutorial, Download a Web Page</h1>
+          <span class="label label-default">2015-03-02</span>
+          <p>In this tutorial, we try to download a web page through Python.</p>
+
+          <h1>Basic</h1>
+          <p>Browser is a software which shows web page. There is a standard
+            protocol, HTTP, between browser and server, to make them understand
+            each other. Browser finds the server address through the web page
+            address, the so called URL, opens a connection to the server, and
+            writes request information accordingly. The server acts as a
+            listener. When a connection request with data arrived, the server
+            interpret it and replys contents respectively.</p>
+
+          <p>As already implemented in standard Python module, we can write a
+          simple HTTP server in one command line:</p>
+          <pre>
+python -m SimpleHTTPServer 8128</pre>
+
+          <p>After that, open your browser and type address <code>localhost:8128</code>,
+            you will see a list of files in current work directoy. If you have a
+            public IP address, you current work directory is exposed to the
+            whole world, every body can access your file now.</p>
+
+          <p>The server side is not covered by this tutorial, but we may need
+            this to verify that our downloading program acts correctly.</p>
+
+          <p>We usually call the program which launchs the connection to remote
+          side, server side, as a client. The browser is a client. A downloading
+          client is much simpler than a browser. As already implemented by
+          standrad Python module, we just need to understand parts meaning to
+          use it.</p>
+
+          <h1>Downloading Client</h1>
+
+<pre>
+import urlib.request
+
+def Download(url, filename):
+  """Download url and write its content to filename."""
+</pre>
+
+        </div>
+        <div class="col-md-3">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
