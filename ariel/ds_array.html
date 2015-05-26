@@ -224,7 +224,6 @@ void DoubleArraySet(DoubleArray* array, size_t i, double v) {
 #include &lt;stdlib.h&gt;
 #include &lt;assert.h&gt;
 
-// This store information about a type.
 typedef struct TypeInfo {
   // Common opaque data to all methods.
   void* data_;
@@ -239,6 +238,9 @@ typedef struct TypeInfo {
   // Assume dest is already initialized. After this, resource managed by src is
   // moved to dest, there is no need to call release_ any more.
   void (*move_)(void* data, void* dest, void* src);
+
+  // Assume dest is already initialized.
+  void (*copy_)(void* data, void* dest, const void* src);
 } TypeInfo;
 
 void TypeInfoInitPod(TypeInfo* info, size_t size);
@@ -252,7 +254,7 @@ typedef struct Array {
 
 void TypeInfoInitArray(TypeInfo* info, const TypeInfo* element_info);
 
-void ArrayInit(Array* array, size_t size, TypeInfo* element_info);
+void ArrayInit(Array* array, size_t size, const TypeInfo* element_info);
 
 void ArrayRelease(Array* array);
 
@@ -277,11 +279,16 @@ void ArrayElementRelease(void* data, Array* array);
 
 #include &lt;stdint.h&gt;
 
-static void POD_move(void* data, void* dest, void* src) {
+static void POD_copy(void* data, void* dest, const void* src) {
   memcpy(dest, src, (intptr_t)data);
 }
 
+static void POD_move(void* data, void* dest, void* src) {
+  memmove(dest, src, (intptr_t)data);
+}
+
 static void POD_init(void* data, void* p) {}
+
 static void POD_release(void* data, void* p) {}
 
 void TypeInfoInitPod(TypeInfo* info, size_t size) {
@@ -290,6 +297,7 @@ void TypeInfoInitPod(TypeInfo* info, size_t size) {
   info->size_ = size;
   info->init_ = POD_init;
   info->release_ = POD_release;
+  info->copy_ = POD_copy;
   info->move_ = POD_move;
 }
 
@@ -300,8 +308,26 @@ static void Array_init(void* data, void* p) {
 static void Array_release(void* data, void* p) { ArrayRelease(p); }
 
 static void Array_move(void* data, void* dest, void* src) {
-  memcpy(dest, src, sizeof(Array));
-  memset(src, 0, sizeof(Array));
+  Array* d = (Array*)dest;
+  Array* s = (Array*)src;
+  if (d != s) {
+    ArrayRelease(d);
+    memcpy(dest, src, sizeof(Array));
+    memset(src, 0, sizeof(Array));
+  }
+}
+
+static void Array_copy(void* data, void* dest, const void* src) {
+  Array* d = (Array*)dest;
+  Array* s = (Array*)src;
+  if (d != s) {
+    ArrayRelease(d);
+    ArrayInit(d, ArraySize(s), s->element_info_);
+    for (size_t i = 0, n = ArraySize(d); i < n; ++i) {
+      d->element_info_->copy_(d->element_info_->data_, ArrayGet(d, i),
+                              ArrayGet(s, i));
+    }
+  }
 }
 
 void TypeInfoInitArray(TypeInfo* info, const TypeInfo* element_info) {
@@ -309,13 +335,14 @@ void TypeInfoInitArray(TypeInfo* info, const TypeInfo* element_info) {
   info->data_ = (void*)element_info;
   info->init_ = Array_init;
   info->release_ = Array_release;
+  info->copy_ = Array_copy;
   info->move_ = Array_move;
 }
 
 // A help routine.
 static inline void* Offset(void* data, size_t n) { return &((char*)data)[n]; }
 
-void ArrayInit(Array* array, size_t size, TypeInfo* element_info) {
+void ArrayInit(Array* array, size_t size, const TypeInfo* element_info) {
   memset(array, 0, sizeof(Array));
   array->element_info_ = element_info;
   if (size > 0) {
