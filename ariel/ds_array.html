@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Tutorial, Array</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#weizi-navbar">
+            <span class="sr-only">Navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Weizi</a>
+        </div>
+        <div class="collapse navbar-collapse" id="weizi-navbar">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li class="active"><a href="index.html">Tutorial for Ariel <span class="sr-only">(current)</span></a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-9">
+          <h1>Tutorial, Array</h1>
+          <span class="label label-default">2015-05-26</span>
+
+          <p>In this tutorial, we define array interfaces and try to implement
+          it in C.</p>
+
+          <h1>What is a Array</h1>
+
+          <p>Array is a container holding multiple values of the same type, and
+            can be read, written with random offset.</p>
+
+          <p>Generally, array should support constant time complexity in random
+            access(read and write). An array that supports resize is a dynamic
+            array, otherwise, it is a static size array.</p>
+
+          <p>Given any array type <code>Array</code>, it should support these methods</p>
+
+          <pre>
+  // Initial an array.
+  void ArrayInit(Array* array, size_t size);
+
+  // Release the array. After this, the array content is invalid.
+  void ArrayRelease(Array* array);
+
+  // Returns the number of elements in the array.
+  size_t ArraySize(const Array* array);
+
+  // Truncates or extends the array. It is a fatal error if this
+  // failed. Implementation can change the interface to return true indicating
+  // success.
+  void ArrayResize(const Array* array, size_t new_size);
+
+  // In the folllowing function, all offset i should less than the array size.
+  // It is a runtime error if an offset is larger than ArraySize. Checking this
+  // or not, is a implementation behavior.
+
+  // Returns the adress of element at offset i.
+  void* ArrayGet(Array* array, size_t i);
+          </pre>
+
+          <p>A non general array type might have type information in these methods to simplify the usage, for example, a array of double can be defined by accesing methods</p>
+
+          <pre>
+void DoubleArrayInit(DoubleArray* array, size_t size);
+void DoubleArrayRelease(DoubleArray* array);
+size_t DoubleArraySize(const DoubleArray* array);
+void DoubleArrayResize(DoubleArray* array, size_t new_size);
+double DoubleArrayGet(DoubleArray* array, size_t i);
+void DoubleArraySet(DoubleArray* array, size_t i, double v);
+          </pre>
+
+          <h1>Python Array</h1>
+
+          <p>Python supports array natively, and call it list. The interfaces we
+          defined above for array can be implemented as:</p>
+
+          <pre>
+# Python does not support pointer, instead, we return a new array.
+def ArrayInit(size):
+  return [None] * size
+
+def ArrayRelease(array):
+  # In python, objects are managed automatically.
+  pass
+
+def ArraySize(array):
+  return len(array)
+
+def ArrayResize(array, size):
+  while len(array) > size:
+    array.pop()
+  if len(array) < size:
+    array.extend([None] * (size - len(array)))
+
+def ArrayGet(array, i):
+  return array[i]
+
+def ArraySet(array, i, v):
+  array[i] = v
+                  </pre>
+
+          <p>It is more tedious than native Python list, so we prefer to work on
+            Python list directly, and view it as an array, instead of through
+            Array* methods.</p>
+
+          <p>An object oriented way to implement Array methods, is encapsulating
+          all methods as a class member methods:</p>
+
+          <pre>
+class Array(object):
+  def __init__(self, size=0):
+    self.values = [None] * size
+
+  def Size(self):
+    return len(self.values)
+
+  def Resize(self, new_size):
+    while self.Size() > new_size:
+      self.values.pop()
+    if self.Size() < new_size:
+      self.values.extend([None] * (size - len(array)))
+
+  def Get(self, i):
+    self.values[i]
+
+  def Set(self, i, v):
+    self.values[i] = v
+          </pre>
+
+          <h1>C Array</h1>
+
+          <p>C supports compile time static size array with syntax:</p>
+
+          <pre>
+double array[10];
+          </pre>
+
+          <p>The array size must be a compile time constant. This static size
+          array can only be passed to function as raw pointer, with size
+          explicitly. We can not change the size, and can not get the size
+            through the pointer.</p>
+
+          <p>To implement a dynamic size array in C, we need manage the memory
+          our self.</p>
+
+<pre>
+// Not tested.
+#include &lt;stddef.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+
+typedef struct DoubleArray {
+  double* data_;
+  size_t size_;
+  size_t allocated_;
+} DoubleArray;
+
+void DoubleArrayInit(DoubleArray* array, size_t size) {
+  void* p = malloc(size * sizeof(double));
+  assert(p); /* Check malloc successed. */
+  array->data_ = p;
+  array->size_ = size;
+  array->allocated_ = size;
+}
+
+void DoubleArrayRelease(DoubleArray* array) {
+  free(array->data_);
+}
+
+size_t DoubleArraySize(const DoubleArray* array) {
+  return array->size_;
+}
+
+void DoubleArrayResize(DoubleArray* array, size_t new_size) {
+  if (new_size <= array->allocated_) {
+    array->size_ = new_size;
+    return;
+  }
+  size_t allocation = new_size;
+  if (allocation < array->size_ * 2) {
+    allocation = array->size_ * 2;
+  }
+  void* p = realloc(array->data_, allocation * sizeof(double));
+  assert(p);
+  array->data_ = p;
+  array->size_ = new_size;
+  array->allocated_ = allocation;
+}
+
+double DoubleArrayGet(DoubleArray* array, size_t i) {
+  assert(i < DoubleArraySize(array));
+  return array->data_[i];
+}
+
+void DoubleArraySet(DoubleArray* array, size_t i, double v) {
+  assert(i < DoubleArraySize(array));
+  array->data_[i] = v;
+}
+</pre>
+
+          <p>To impelement a general array in C, we need to store the manage
+          functions based on the element type:</p>
+
+          <pre>
+// file array.h.
+#ifndef FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H
+#define FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H
+
+#include &lt;string.h&gt;
+#include &lt;stddef.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;assert.h&gt;
+
+// This store information about a type.
+typedef struct TypeInfo {
+  // Common opaque data to all methods.
+  void* data_;
+
+  // Compile time size of this type.
+  size_t size_;
+
+  void (*init_)(void* data, void* p);
+
+  void (*release_)(void* data, void* p);
+
+  // Assume dest is already initialized. After this, resource managed by src is
+  // moved to dest, there is no need to call release_ any more.
+  void (*move_)(void* data, void* dest, void* src);
+} TypeInfo;
+
+void TypeInfoInitPod(TypeInfo* info, size_t size);
+
+typedef struct Array {
+  void* data_;
+  size_t size_;
+  size_t allocated_;
+  const TypeInfo* element_info_;
+} Array;
+
+void TypeInfoInitArray(TypeInfo* info, const TypeInfo* element_info);
+
+void ArrayInit(Array* array, size_t size, TypeInfo* element_info);
+
+void ArrayRelease(Array* array);
+
+// Returns the size of the array, i.e. the number of elements in the array.
+size_t ArraySize(const Array* array);
+
+// Resize the array.
+void ArrayResize(Array* array, size_t new_size);
+
+// Returns the pointer of element at array with offset i.
+void* ArrayGet(Array* array, size_t i);
+
+// Release function to use array as another array element.
+void ArrayElementRelease(void* data, Array* array);
+
+#endif  // FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H
+          </pre>
+
+          <pre>
+// file array.c.
+#include "array.h"
+
+#include &lt;stdint.h&gt;
+
+static void POD_move(void* data, void* dest, void* src) {
+  memcpy(dest, src, (intptr_t)data);
+}
+
+static void POD_init(void* data, void* p) {}
+static void POD_release(void* data, void* p) {}
+
+void TypeInfoInitPod(TypeInfo* info, size_t size) {
+  memset(info, 0, sizeof(TypeInfo));
+  info->data_ = (void*)(intptr_t)size;
+  info->size_ = size;
+  info->init_ = POD_init;
+  info->release_ = POD_release;
+  info->move_ = POD_move;
+}
+
+static void Array_init(void* data, void* p) {
+  ArrayInit(p, 0, (TypeInfo*)data);
+}
+
+static void Array_release(void* data, void* p) { ArrayRelease(p); }
+
+static void Array_move(void* data, void* dest, void* src) {
+  memcpy(dest, src, sizeof(Array));
+  memset(src, 0, sizeof(Array));
+}
+
+void TypeInfoInitArray(TypeInfo* info, const TypeInfo* element_info) {
+  TypeInfoInitPod(info, sizeof(Array));
+  info->data_ = (void*)element_info;
+  info->init_ = Array_init;
+  info->release_ = Array_release;
+  info->move_ = Array_move;
+}
+
+// A help routine.
+static inline void* Offset(void* data, size_t n) { return &((char*)data)[n]; }
+
+void ArrayInit(Array* array, size_t size, TypeInfo* element_info) {
+  memset(array, 0, sizeof(Array));
+  array->element_info_ = element_info;
+  if (size > 0) {
+    ArrayResize(array, size);
+  }
+}
+
+void ArrayRelease(Array* array) {
+  // Release elements.
+  for (size_t i = 0, n = ArraySize(array); i < n; ++i) {
+    array->element_info_->release_(array->element_info_->data_,
+                                   ArrayGet(array, i));
+  }
+  // Release array buffer.
+  free(array->data_);
+}
+
+size_t ArraySize(const Array* array) { return array->size_; }
+
+void ArrayResize(Array* array, size_t new_size) {
+  if (new_size <= array->allocated_) {
+    size_t old_size = array->size_;
+    for (size_t i = new_size; i < old_size; ++i) {
+      array->element_info_->release_(array->element_info_->data_,
+                                     ArrayGet(array, i));
+    }
+    array->size_ = new_size;
+    for (size_t i = old_size; i < new_size; ++i) {
+      array->element_info_->init_(
+          array->element_info_->data_,
+          Offset(array->data_, i * array->element_info_->size_));
+    }
+    array->size_ = new_size;
+    return;
+  }
+  size_t allocation = new_size;
+  if (allocation < array->size_ * 2) {
+    allocation = array->size_ * 2;
+  }
+  void* p = malloc(allocation * array->element_info_->size_);
+  assert(p);
+  for (size_t i = 0; i < new_size; ++i) {
+    array->element_info_->init_(array->element_info_->data_,
+                                Offset(p, i * array->element_info_->size_));
+  }
+  size_t common_size = new_size < array->size_ ? new_size : array->size_;
+  for (size_t i = 0; i < common_size; ++i) {
+    array->element_info_->move_(array->element_info_->data_,
+                                Offset(p, i * array->element_info_->size_),
+                                ArrayGet(array, i));
+  }
+  for (size_t i = common_size; i < array->size_; ++i) {
+    array->element_info_->release_(array->element_info_->data_,
+                                   ArrayGet(array, i));
+  }
+  free(array->data_);
+  array->data_ = p;
+  array->size_ = new_size;
+  array->allocated_ = allocation;
+}
+
+void* ArrayGet(Array* array, size_t i) {
+  assert(i < ArraySize(array));
+  return Offset(array->data_, i * array->element_info_->size_);
+}
+          </pre>
+
+          <pre>
+// file array_test.c
+#include "array.h"
+
+#include &lt;stdio.h&gt;
+
+void TestDoubleArray() {
+  Array a[1];
+  TypeInfo double_info[1];
+  TypeInfoInitPod(double_info, sizeof(double));
+  ArrayInit(a, 1, double_info);
+  assert(ArraySize(a) == 1);
+  ArrayResize(a, 10);
+  assert(ArraySize(a) == 10);
+  for (size_t i = 0; i < 10; ++i) {
+    double v = 1.0 / (i + 1);
+    *(double*)ArrayGet(a, i) = v;
+  }
+  double s = 0;
+  for (size_t i = 0; i < ArraySize(a); ++i) {
+    s += *(double*)ArrayGet(a, i);
+  }
+
+  printf("In func %s(line %d), sum=%lf\n", __func__, __LINE__, s);
+
+  ArrayRelease(a);
+}
+
+void TestArrayOfArray() {
+  Array a[1];
+  TypeInfo double_info[1];
+  TypeInfo array_info[1];
+  TypeInfoInitPod(double_info, sizeof(double));
+  TypeInfoInitArray(array_info, double_info);
+
+  size_t m = 40, n = 3;
+  ArrayInit(a, m - 1, array_info);
+
+  ArrayResize(a, m);
+
+  for (size_t i = 0; i < m; ++i) {
+    Array* row = (Array*)ArrayGet(a, i);
+    ArrayResize(row, n);
+    for (size_t j = 0; j < n; ++j) {
+      *(double*)ArrayGet(row, j) = 1.0 / (i + j + 1);
+    }
+  }
+
+  double s = 0;
+  for (size_t i = 0; i < ArraySize(a); ++i) {
+    Array* row = (Array*)ArrayGet(a, i);
+    for (size_t j = 0; j < ArraySize(row); ++j) {
+      s += *(double*)ArrayGet(row, j);
+    }
+  }
+
+  printf("In func %s(line %d), sum=%lf\n", __func__, __LINE__, s);
+
+  ArrayRelease(a);
+}
+
+int main(int argc, char* argv[]) {
+
+  TestDoubleArray();
+
+  TestArrayOfArray();
+
+  return 0;
+}
+                           </pre>
+          <h1>Problems</h1>
+          <p><span class="label label-default">Problem 1</span> Implement <code>ArraySlice</code>, which only keeps a continuous sub range of an array.</p>
+          <pre>
+            // After ArraySlice, ArraySize(a) == len, the first element in a, is
+            // the offset-th element in old array.
+            void ArraySlice(Array* a, size_t offset, size_t len);
+          </pre>
+        </div>
+        <div class="col-md-3">
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
