@@ -481,11 +481,11 @@ int main(int argc, char* argv[]) {
 }
                            </pre>
           <h1>Problems</h1>
-          <p><span class="label label-default">Problem 1</span> Implement <code>ArraySlice</code>, which only keeps a continuous sub range of an array.</p>
+          <p><span class="label label-default">Problem 1</span>
+          Implement <code>ArraySplice</code>, which replace a continuous sub
+          range of one array with range in another array.</p>
           <pre>
-            // After ArraySlice, ArraySize(a) == len, the first element in a, is
-            // the offset-th element in old array.
-            void ArraySlice(Array* a, size_t offset, size_t len);
+            void ArraySplice(Array* dest, size_t dest_offset, size_t dest_len, Array* src, size_t src_offset, size_t src_len);
           </pre>
         </div>
         <div class="col-md-3">
