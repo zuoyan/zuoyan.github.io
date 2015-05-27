@@ -112,7 +112,7 @@ void ArrayResize(Array* array, size_t new_size) {
     info->move_(info->data_, Offset(p, i * info->size_),
                 Offset(array->data_, i * info->size_));
   }
-  for (size_t i = common_size; i < array->size_; ++i) {
+  for (size_t i = 0; i < array->size_; ++i) {
     info->release_(info->data_, Offset(array->data_, i * info->size_));
   }
   free(array->data_);

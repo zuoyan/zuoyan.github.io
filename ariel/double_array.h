@@ -12,15 +12,22 @@ typedef struct DoubleArray {
 } DoubleArray;
 
 static inline void DoubleArrayInit(DoubleArray* array, size_t size) {
-  void* p = malloc(size * sizeof(double));
-  assert(p); /* Check malloc successed. */
-  array->data_ = (double*)p;
+  if (size > 0) {
+    void* p = malloc(size * sizeof(double));
+    assert(p); /* Check malloc successed. */
+    array->data_ = (double*)p;
+  } else {
+    array->data_ = NULL;
+  }
   array->size_ = size;
   array->allocated_ = size;
 }
 
 static inline void DoubleArrayRelease(DoubleArray* array) {
-  free(array->data_);
+  if (array->data_) {
+    free(array->data_);
+  }
+  DoubleArrayInit(array, 0);
 }
 
 static inline size_t DoubleArraySize(const DoubleArray* array) {
