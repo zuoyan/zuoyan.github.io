@@ -73,13 +73,11 @@ void ArrayInit(Array* array, size_t size, const TypeInfo* element_info) {
 }
 
 void ArrayRelease(Array* array) {
-  // Release elements.
-  const TypeInfo* info = array->element_info_;
-  for (size_t i = 0, n = ArraySize(array); i < n; ++i) {
-    info->release_(info->data_, Offset(array->data_, i * info->size_));
-  }
-  // Release array buffer.
+  // Resize to 0 to release elements.
+  ArrayResize(array, 0);
   free(array->data_);
+  // Leave an empty valid array.
+  ArrayInit(array, 0, array->element_info_);
 }
 
 size_t ArraySize(const Array* array) { return array->size_; }
@@ -91,7 +89,6 @@ void ArrayResize(Array* array, size_t new_size) {
     for (size_t i = new_size; i < old_size; ++i) {
       info->release_(info->data_, Offset(array->data_, i * info->size_));
     }
-    array->size_ = new_size;
     for (size_t i = old_size; i < new_size; ++i) {
       info->init_(info->data_, Offset(array->data_, i * info->size_));
     }

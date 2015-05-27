@@ -79,7 +79,7 @@ table.sourceCode pre {
 <p>Initial the <code>array</code> conaining <code>size</code> elements.</p>
 <p>A impelementation might requires more information in the <code>ArrayInit</code>, such as the type information to manage the resource holded by elements.</p></li>
 <li><p><code class="sourceCode c"><span class="dt">void</span> ArrayRelease(Array* array)</code></p>
-<p>Release the <code>array</code>. After this, the <code>array</code> content is invalid. But an implementation might leave the <code>array</code> as initialized with zero.</p></li>
+<p>Release the <code>array</code>. After this, the <code>array</code> content is invalid. But a implementation might leave the <code>array</code> as initialized with zero.</p></li>
 <li><p><code class="sourceCode c">size_t ArraySize(<span class="dt">const</span> Array* array)</code></p>
 <p>Returns the number of elements stored in <code>array</code>.</p></li>
 <li><p><code class="sourceCode c"><span class="dt">void</span> ArrayResize(<span class="dt">const</span> Array* array, size_t new_size)</code></p>
@@ -161,6 +161,8 @@ table.sourceCode pre {
 54
 55
 56
+57
+58
 </pre></td><td class="sourceCode"><pre><code class="sourceCode c"><span class="ot">#ifndef FILE_236B6066_3B25_4C9D_A3B2_D2AA3F7827CA_H</span>
 <span class="ot">#define FILE_236B6066_3B25_4C9D_A3B2_D2AA3F7827CA_H</span>
 
@@ -174,16 +176,18 @@ table.sourceCode pre {
   size_t allocated_;
 } DoubleArray;
 
+<span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> DoubleArrayResize(DoubleArray* array, size_t new_size);
+
 <span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> DoubleArrayInit(DoubleArray* array, size_t size) {
-  <span class="dt">void</span>* p = malloc(size * <span class="kw">sizeof</span>(<span class="dt">double</span>));
-  assert(p); <span class="co">/* Check malloc successed. */</span>
-  array-&gt;data_ = (<span class="dt">double</span>*)p;
-  array-&gt;size_ = size;
-  array-&gt;allocated_ = size;
+  memset(array, <span class="dv">0</span>, <span class="kw">sizeof</span>(*array));
+  <span class="kw">if</span> (size &gt; <span class="dv">0</span>) {
+    DoubleArrayResize(array, size);
+  }
 }
 
 <span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span> DoubleArrayRelease(DoubleArray* array) {
   free(array-&gt;data_);
+  memset(array, <span class="dv">0</span>, <span class="kw">sizeof</span>(*array));
 }
 
 <span class="dt">static</span> <span class="kw">inline</span> size_t DoubleArraySize(<span class="dt">const</span> DoubleArray* array) {
@@ -457,9 +461,6 @@ size_t ArraySize(<span class="dt">const</span> Array* array);
 122
 123
 124
-125
-126
-127
 </pre></td><td class="sourceCode"><pre><code class="sourceCode c"><span class="ot">#include &quot;array.h&quot;</span>
 
 <span class="ot">#include &lt;stdint.h&gt;</span>
@@ -535,13 +536,11 @@ size_t ArraySize(<span class="dt">const</span> Array* array);
 }
 
 <span class="dt">void</span> ArrayRelease(Array* array) {
-  <span class="co">// Release elements.</span>
-  <span class="dt">const</span> TypeInfo* info = array-&gt;element_info_;
-  <span class="kw">for</span> (size_t i = <span class="dv">0</span>, n = ArraySize(array); i &lt; n; ++i) {
-    info-&gt;release_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
-  }
-  <span class="co">// Release array buffer.</span>
+  <span class="co">// Resize to 0 to release elements.</span>
+  ArrayResize(array, <span class="dv">0</span>);
   free(array-&gt;data_);
+  <span class="co">// Leave an empty valid array.</span>
+  ArrayInit(array, <span class="dv">0</span>, array-&gt;element_info_);
 }
 
 size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">return</span> array-&gt;size_; }
@@ -553,7 +552,6 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
     <span class="kw">for</span> (size_t i = new_size; i &lt; old_size; ++i) {
       info-&gt;release_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
     }
-    array-&gt;size_ = new_size;
     <span class="kw">for</span> (size_t i = old_size; i &lt; new_size; ++i) {
       info-&gt;init_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
     }
@@ -574,7 +572,7 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
     info-&gt;move_(info-&gt;data_, Offset(p, i * info-&gt;size_),
                 Offset(array-&gt;data_, i * info-&gt;size_));
   }
-  <span class="kw">for</span> (size_t i = common_size; i &lt; array-&gt;size_; ++i) {
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; array-&gt;size_; ++i) {
     info-&gt;release_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
   }
   free(array-&gt;data_);

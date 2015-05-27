@@ -30,7 +30,7 @@ Given any array type <code>Array</code>, it should support these methods:
 
 * `void ArrayRelease(Array* array)`{.C}
 
-    Release the `array`. After this, the `array` content is invalid. But an
+    Release the `array`. After this, the `array` content is invalid. But a
     implementation might leave the `array` as initialized with zero.
 
 * `size_t ArraySize(const Array* array)`{.C}
