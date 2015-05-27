@@ -89,24 +89,6 @@ In C, we need to manage all memory manually. In the implementation of
 ~~~ {.C .numberLines include=double_array.h}
 ~~~
 
-<span class="label label-default">Problem</span>: This code is not tested, please write some code to test this implementation.
-
-<span class="label label-default">Problem</span>: Implement `double Sum(DoubleArray*array)`{.C}, returns the summation of
-all values in the array.
-
-<span class="label label-default">Problem</span>: Implement `size_t ArgMax(DoubleArray*array)`{.C}, which returns the
-index of max value in the array, and returns zero for empty array.
-
-<span class="label label-default">Problem</span>: Implement `void DoubleArrayAppend(DoubleArray* array, double v)`{.C}
-based on the other access methods in above, without touching `DoubleArray`
-fields.
-
-<span class="label label-default">Problem</span>: Since this implementation is quite simple, we can copy code and rename
-the type for `IntArray`, `Int64Array`. Try to define a macro `PLAIN_ARRAY(name,
-type)`, which generate array code automatically. For example,
-`PLAIN_ARRAY(DoubleArray, double)` can generate above code, `PLAIN_ARRAY(IVec,
-int)` generate code for int array, with all methods prefixed by IVec.
-
 ## General type Array
 
 To implement a general type Array, we need to abstract some common routines to
@@ -124,18 +106,74 @@ can be passed to `ArrayInit` without life time problem.
 ~~~ {.C .numberLines include=array.h}
 ~~~
 
-### File array.c
-
-~~~ {.C .numberLines include=array.c}
-array.c
-~~~
-
 ### File array_test.c
 
 ~~~ {.C .numberLines include=array_test.c}
 ~~~
 
-<span class="label label-default">Problem</span>: Implement `ArraySplice`{.C}, which replace a continuous sub range of one
-array with range in another array.
+### File array.c
 
-`void ArraySplice(Array* dest, size_t dest_offset, size_t dest_len, Array* src, size_t src_offset, size_t src_len)`{.C}.
+Before reading this file, you are encouraged to implement yourself version, to
+make array_test pass, see [Problems](#problems) sections.
+
+~~~ {.C .numberLines include=array.c}
+array.c
+~~~
+
+# Compile and test
+
+Assume we copy the relative code to file `double_array.h`, `array.h`, `array.c`
+and `array_test.c` respectively, this code can be compiled and tested as:
+
+~~~ {.bash}
+# clang can be replacce by gcc, or cc
+clang -std=c11 -Wall -O0 -g array_test.cc array.c -o array_test
+./arary_test
+# If valgrind is installed.
+valgrind ./array_test
+~~~
+
+If you implement yourself version `array.c` in another file `array_ya.c`, then
+it can be tested as:
+
+~~~ {.bash}
+clang -std=c11 -Wall -O0 -g array_test.cc array_ya.c -o array_ya_test
+./arary_ya_test
+# If valgrind is installed.
+valgrind ./array_ya_test
+~~~
+
+# Problems
+
+<span class="label label-default">Problem</span> This code is not tested, please
+write some code to test this implementation.
+
+<span class="label label-default">Problem</span> Implement `double
+Sum(DoubleArray*array)`{.C}, returns the summation of all values in the array.
+
+<span class="label label-default">Problem</span> Implement `size_t
+ArgMax(DoubleArray*array)`{.C}, which returns the index of max value in the
+array, and returns zero for empty array.
+
+<span class="label label-default">Problem</span> Implement `void
+DoubleArrayAppend(DoubleArray* array, double v)`{.C} based on the other access
+methods in above, without touching `DoubleArray` fields.
+
+<span class="label label-default">Problem</span> Since the `DoubleArray`'s
+implementation is quite simple, we can copy code and rename the type for
+`IntArray`, `Int64Array`. Try to define a macro `PLAIN_ARRAY(name, type)`, which
+generate array code automatically. For example, `PLAIN_ARRAY(DoubleArray,
+double)` can generate the code for `DoubleArray`, `PLAIN_ARRAY(IVec, int)`
+generate code for int array, with all methods prefixed by IVec.
+
+<span class="label label-default">Problem</span> Re-implement all `Array`{.C} methods.
+
+<span class="label label-default">Problem</span> Implement a function to swap
+two non interleaved ranges of array:
+
+`void ArraySwapRanges(Array* array, size_t first_offset, size_t first_len,
+size_t second_offset, size_t second_len)`{.C}
+
+For example, for arary `[1, 2, 3, 4, 5, 6, 7, 8]`, calling
+`ArraySwapRanges(array, 1, 2, 4, 3)`{.C} will modifiy the array into
+`[1, 5, 6, 7, 4, 2, 3, 8]`.

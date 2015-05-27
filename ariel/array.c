@@ -10,9 +10,9 @@ static void Plain_move(void* data, void* dest, void* src) {
   memmove(dest, src, (intptr_t)data);
 }
 
-static void Plain_init(void* data, void* p) {}
+static void Plain_init(void* data, void* p) { memset(p, 0, (intptr_t)data); }
 
-static void Plain_release(void* data, void* p) {}
+static void Plain_release(void* data, void* p) { memset(p, 0, (intptr_t)data); }
 
 void TypeInfoInitPlain(TypeInfo* info, size_t size) {
   memset(info, 0, sizeof(TypeInfo));
@@ -25,34 +25,38 @@ void TypeInfoInitPlain(TypeInfo* info, size_t size) {
 }
 
 // A help routine.
-static inline void* Offset(void* data, size_t n) { return &((char*)data)[n]; }
+static inline void* Offset(const void* data, size_t n) {
+  return &((char*)data)[n];
+}
 
 static void Array_init(void* data, void* p) {
   ArrayInit(p, 0, (TypeInfo*)data);
 }
 
-static void Array_release(void* data, void* p) { ArrayRelease(p); }
+static void Array_release(void* data, void* p) {
+  assert(data == ((Array*)p)->element_info_);
+  ArrayRelease(p);
+}
 
 static void Array_move(void* data, void* dest, void* src) {
   Array* d = (Array*)dest;
   Array* s = (Array*)src;
   assert(d != s);
-  ArrayRelease(d);
-  memcpy(dest, src, sizeof(Array));
-  memset(src, 0, sizeof(Array));
+  assert(data == ((Array*)d)->element_info_);
+  assert(data == ((Array*)s)->element_info_);
+  // Swap *d and *s.
+  Array t = *d;
+  *d = *s;
+  *s = t;
 }
 
 static void Array_copy(void* data, void* dest, const void* src) {
   Array* d = (Array*)dest;
   Array* s = (Array*)src;
   assert(d != s);
-  ArrayRelease(d);
-  ArrayInit(d, ArraySize(s), s->element_info_);
-  const TypeInfo* info = s->element_info_;
-  for (size_t i = 0, n = ArraySize(d); i < n; ++i) {
-    info->copy_(info->data_, Offset(d->data_, i * info->size_),
-                Offset(s->data_, i * info->size_));
-  }
+  assert(data == ((Array*)d)->element_info_);
+  assert(data == ((Array*)s)->element_info_);
+  ArraySplice(d, 0, ArraySize(d), s, 0, ArraySize(s));
 }
 
 void TypeInfoInitArray(TypeInfo* info, const TypeInfo* element_info) {
@@ -118,7 +122,137 @@ void ArrayResize(Array* array, size_t new_size) {
   array->allocated_ = allocation;
 }
 
-void* ArrayGet(Array* array, size_t i) {
+void* ArrayGet(const Array* array, size_t i) {
   assert(i < ArraySize(array));
   return Offset(array->data_, i * array->element_info_->size_);
+}
+
+void ArrayErase(Array* array, size_t offset, size_t len) {
+  assert(offset + len <= ArraySize(array));
+  if (!len) {
+    return;
+  }
+  const TypeInfo* info = array->element_info_;
+  size_t old_size = ArraySize(array);
+  for (size_t i = offset + len; i < old_size; ++i) {
+    info->move_(info->data_, Offset(array->data_, (i - len) * info->size_),
+                Offset(array->data_, i * info->size_));
+  }
+  ArrayResize(array, old_size - len);
+}
+
+void ArrayInsertInitValues(Array* array, size_t offset, size_t len) {
+  assert(offset <= ArraySize(array));
+  if (!len) {
+    return;
+  }
+  const TypeInfo* info = array->element_info_;
+  size_t old_size = ArraySize(array);
+  ArrayResize(array, old_size + len);
+  for (size_t i = old_size; i-- > offset;) {
+    info->move_(info->data_, Offset(array->data_, (i + len) * info->size_),
+                Offset(array->data_, i * info->size_));
+  }
+}
+
+void ArrayInsertBuffer(Array* array, size_t offset, const void* src,
+                       size_t len) {
+  assert(offset <= ArraySize(array));
+  if (!len) {
+    return;
+  }
+  const TypeInfo* info = array->element_info_;
+  ArrayInsertInitValues(array, offset, len);
+  for (size_t i = 0; i < len; ++i) {
+    info->copy_(info->data_, Offset(array->data_, (i + offset) * info->size_),
+                Offset(src, i * info->size_));
+  }
+}
+
+void ArrayMoveBuffer(Array* array, size_t offset, void* src, size_t len) {
+  assert(offset <= ArraySize(array));
+  if (!len) {
+    return;
+  }
+  const TypeInfo* info = array->element_info_;
+  ArrayInsertInitValues(array, offset, len);
+  for (size_t i = 0; i < len; ++i) {
+    info->move_(info->data_, Offset(array->data_, (i + offset) * info->size_),
+                Offset(src, i * info->size_));
+  }
+}
+
+void ArraySpliceBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                       const void* src, size_t src_len) {
+  assert(dest_offset + dest_len <= ArraySize(dest));
+  const TypeInfo* info = dest->element_info_;
+  size_t old_size = ArraySize(dest);
+  size_t common_len = dest_len < src_len ? dest_len : src_len;
+  for (size_t i = 0; i < common_len; ++i) {
+    info->copy_(info->data_,
+                Offset(dest->data_, (i + dest_offset) * info->size_),
+                Offset(src, i * info->size_));
+  }
+  if (src_len < dest_len) {
+    ArrayErase(dest, dest_offset + src_len, dest_len - src_len);
+  } else if (src_len > dest_len) {
+    ArrayInsertBuffer(dest, dest_offset + dest_len,
+                      Offset(src, dest_len * info->size_), src_len - dest_len);
+  }
+  assert(ArraySize(dest) == old_size + src_len - dest_len);
+}
+
+void ArraySpliceMoveBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                           void* src, size_t src_len) {
+  assert(dest_offset + dest_len <= ArraySize(dest));
+  const TypeInfo* info = dest->element_info_;
+  size_t old_size = ArraySize(dest);
+  size_t common_len = dest_len < src_len ? dest_len : src_len;
+  for (size_t i = 0; i < common_len; ++i) {
+    info->move_(info->data_,
+                Offset(dest->data_, (i + dest_offset) * info->size_),
+                Offset(src, i * info->size_));
+  }
+  if (src_len < dest_len) {
+    ArrayErase(dest, dest_offset + src_len, dest_len - src_len);
+  } else if (src_len > dest_len) {
+    ArrayMoveBuffer(dest, dest_offset + dest_len,
+                    Offset(src, dest_len * info->size_), src_len - dest_len);
+  }
+  assert(ArraySize(dest) == old_size + src_len - dest_len);
+}
+
+void ArraySplice(Array* dest, size_t dest_offset, size_t dest_len,
+                 const Array* src, size_t src_offset, size_t src_len) {
+  assert(dest_offset + dest_len <= ArraySize(dest));
+  assert(dest->element_info_ == src->element_info_);
+  assert(src_offset + src_len <= ArraySize(src));
+  assert(dest->element_info_ == src->element_info_);
+  ArraySpliceBuffer(dest, dest_offset, dest_len,
+                    src_len ? ArrayGet(src, src_offset) : NULL, src_len);
+}
+
+void ArraySpliceMove(Array* dest, size_t dest_offset, size_t dest_len,
+                     Array* src, size_t src_offset, size_t src_len) {
+  assert(dest_offset + dest_len <= ArraySize(dest));
+  assert(dest->element_info_ == src->element_info_);
+  assert(src_offset + src_len <= ArraySize(src));
+  assert(dest->element_info_ == src->element_info_);
+  ArraySpliceMoveBuffer(dest, dest_offset, dest_len,
+                        src_len ? ArrayGet(src, src_offset) : NULL, src_len);
+}
+
+void ArraySpliceCut(Array* dest, size_t dest_offset, size_t dest_len,
+                    Array* src, size_t src_offset, size_t src_len) {
+  ArraySpliceMove(dest, dest_offset, dest_len, src, src_offset, src_len);
+  ArrayErase(src, src_offset, src_len);
+}
+
+void ArrayAppend(Array* a, void* value) {
+  ArrayInsertBuffer(a, ArraySize(a), value, 1);
+}
+
+void ArrayPop(Array* array) {
+  assert(ArraySize(array) > 0);
+  ArrayResize(array, ArraySize(array) - 1);
 }

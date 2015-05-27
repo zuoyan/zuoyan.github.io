@@ -221,123 +221,11 @@ table.sourceCode pre {
 }
 
 <span class="ot">#endif  </span><span class="co">// FILE_236B6066_3B25_4C9D_A3B2_D2AA3F7827CA_H</span></code></pre></td></tr></table>
-<p><span class="label label-default">Problem</span>: This code is not tested, please write some code to test this implementation.</p>
-<p><span class="label label-default">Problem</span>: Implement <code class="sourceCode c"><span class="dt">double</span> Sum(DoubleArray*array)</code>, returns the summation of all values in the array.</p>
-<p><span class="label label-default">Problem</span>: Implement <code class="sourceCode c">size_t ArgMax(DoubleArray*array)</code>, which returns the index of max value in the array, and returns zero for empty array.</p>
-<p><span class="label label-default">Problem</span>: Implement <code class="sourceCode c"><span class="dt">void</span> DoubleArrayAppend(DoubleArray* array, <span class="dt">double</span> v)</code> based on the other access methods in above, without touching <code>DoubleArray</code> fields.</p>
-<p><span class="label label-default">Problem</span>: Since this implementation is quite simple, we can copy code and rename the type for <code>IntArray</code>, <code>Int64Array</code>. Try to define a macro <code>PLAIN_ARRAY(name, type)</code>, which generate array code automatically. For example, <code>PLAIN_ARRAY(DoubleArray, double)</code> can generate above code, <code>PLAIN_ARRAY(IVec, int)</code> generate code for int array, with all methods prefixed by IVec.</p>
 <h2 id="general-type-array"><a href="#general-type-array">General type Array</a></h2>
 <p>To implement a general type Array, we need to abstract some common routines to manage data of a dynamic type. We need pass these routines in the <code>ArrayInit</code>, and in <code>ArrayRelease</code>, we also need to release resources allocated by array elements. The initialization and release might also happen in array management, like resize, append, erase.</p>
 <p>We abstract a general type management routines as struct <code>TypeInfo</code>, and believe this can be allocated statistically(or in stack), so a const pointer of TypeInfo can be passed to <code>ArrayInit</code> without life time problem.</p>
 <h3 id="file-array.h"><a href="#file-array.h">File array.h</a></h3>
 <table class="sourceCode C numberLines" include="array.h"><tr class="sourceCode"><td class="lineNumbers"><pre>1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-</pre></td><td class="sourceCode"><pre><code class="sourceCode c"><span class="ot">#ifndef FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H</span>
-<span class="ot">#define FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H</span>
-
-<span class="ot">#include &lt;string.h&gt;</span>
-<span class="ot">#include &lt;stddef.h&gt;</span>
-<span class="ot">#include &lt;stdlib.h&gt;</span>
-<span class="ot">#include &lt;assert.h&gt;</span>
-
-<span class="kw">typedef</span> <span class="kw">struct</span> TypeInfo {
-  <span class="co">// Common opaque data passed to all methods.</span>
-  <span class="dt">void</span>* data_;
-
-  <span class="co">// Compile time size of this type.</span>
-  size_t size_;
-
-  <span class="dt">void</span> (*init_)(<span class="dt">void</span>* data, <span class="dt">void</span>* p);
-
-  <span class="dt">void</span> (*release_)(<span class="dt">void</span>* data, <span class="dt">void</span>* p);
-
-  <span class="co">// Assume dest is already initialized. After this, resource managed by src is</span>
-  <span class="co">// moved to dest.</span>
-  <span class="dt">void</span> (*move_)(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">void</span>* src);
-
-  <span class="co">// Assume dest is already initialized.</span>
-  <span class="dt">void</span> (*copy_)(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">const</span> <span class="dt">void</span>* src);
-} TypeInfo;
-
-<span class="co">// Initializes the TypeInfo for a plain type.</span>
-<span class="dt">void</span> TypeInfoInitPlain(TypeInfo* info, size_t size);
-
-<span class="kw">typedef</span> <span class="kw">struct</span> Array {
-  <span class="dt">void</span>* data_;
-  size_t size_;
-  size_t allocated_;
-  <span class="dt">const</span> TypeInfo* element_info_;
-} Array;
-
-<span class="dt">void</span> TypeInfoInitArray(TypeInfo* info, <span class="dt">const</span> TypeInfo* element_info);
-
-<span class="dt">void</span> ArrayInit(Array* array, size_t size, <span class="dt">const</span> TypeInfo* element_info);
-
-<span class="dt">void</span> ArrayRelease(Array* array);
-
-<span class="co">// Returns the size of the array, i.e. the number of elements in the array.</span>
-size_t ArraySize(<span class="dt">const</span> Array* array);
-
-<span class="co">// Resize the array.</span>
-<span class="dt">void</span> ArrayResize(Array* array, size_t new_size);
-
-<span class="co">// Returns the pointer of element at array with offset i.</span>
-<span class="dt">void</span>* ArrayGet(Array* array, size_t i);
-
-<span class="ot">#endif  </span><span class="co">// FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H</span></code></pre></td></tr></table>
-<h3 id="file-array.c"><a href="#file-array.c">File array.c</a></h3>
-<table class="sourceCode C numberLines" include="array.c"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
 4
@@ -432,159 +320,101 @@ size_t ArraySize(<span class="dt">const</span> Array* array);
 93
 94
 95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-</pre></td><td class="sourceCode"><pre><code class="sourceCode c"><span class="ot">#include &quot;array.h&quot;</span>
+</pre></td><td class="sourceCode"><pre><code class="sourceCode c"><span class="ot">#ifndef FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H</span>
+<span class="ot">#define FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H</span>
 
-<span class="ot">#include &lt;stdint.h&gt;</span>
+<span class="ot">#include &lt;string.h&gt;</span>
+<span class="ot">#include &lt;stddef.h&gt;</span>
+<span class="ot">#include &lt;stdlib.h&gt;</span>
+<span class="ot">#include &lt;assert.h&gt;</span>
 
-<span class="dt">static</span> <span class="dt">void</span> Plain_copy(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">const</span> <span class="dt">void</span>* src) {
-  memcpy(dest, src, (intptr_t)data);
-}
+<span class="kw">typedef</span> <span class="kw">struct</span> TypeInfo {
+  <span class="co">// Common opaque data passed to all methods.</span>
+  <span class="dt">void</span>* data_;
 
-<span class="dt">static</span> <span class="dt">void</span> Plain_move(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">void</span>* src) {
-  memmove(dest, src, (intptr_t)data);
-}
+  <span class="co">// Compile time size of this type.</span>
+  size_t size_;
 
-<span class="dt">static</span> <span class="dt">void</span> Plain_init(<span class="dt">void</span>* data, <span class="dt">void</span>* p) {}
+  <span class="dt">void</span> (*init_)(<span class="dt">void</span>* data, <span class="dt">void</span>* p);
 
-<span class="dt">static</span> <span class="dt">void</span> Plain_release(<span class="dt">void</span>* data, <span class="dt">void</span>* p) {}
+  <span class="dt">void</span> (*release_)(<span class="dt">void</span>* data, <span class="dt">void</span>* p);
 
-<span class="dt">void</span> TypeInfoInitPlain(TypeInfo* info, size_t size) {
-  memset(info, <span class="dv">0</span>, <span class="kw">sizeof</span>(TypeInfo));
-  info-&gt;data_ = (<span class="dt">void</span>*)(intptr_t)size;
-  info-&gt;size_ = size;
-  info-&gt;init_ = Plain_init;
-  info-&gt;release_ = Plain_release;
-  info-&gt;copy_ = Plain_copy;
-  info-&gt;move_ = Plain_move;
-}
+  <span class="co">// Assume dest is already initialized. After this, resource managed by src is</span>
+  <span class="co">// moved to dest.</span>
+  <span class="dt">void</span> (*move_)(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">void</span>* src);
 
-<span class="co">// A help routine.</span>
-<span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span>* Offset(<span class="dt">void</span>* data, size_t n) { <span class="kw">return</span> &amp;((<span class="dt">char</span>*)data)[n]; }
+  <span class="co">// Assume dest is already initialized.</span>
+  <span class="dt">void</span> (*copy_)(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">const</span> <span class="dt">void</span>* src);
+} TypeInfo;
 
-<span class="dt">static</span> <span class="dt">void</span> Array_init(<span class="dt">void</span>* data, <span class="dt">void</span>* p) {
-  ArrayInit(p, <span class="dv">0</span>, (TypeInfo*)data);
-}
+<span class="co">// Initializes the TypeInfo for a plain type.</span>
+<span class="dt">void</span> TypeInfoInitPlain(TypeInfo* info, size_t size);
 
-<span class="dt">static</span> <span class="dt">void</span> Array_release(<span class="dt">void</span>* data, <span class="dt">void</span>* p) { ArrayRelease(p); }
+<span class="kw">typedef</span> <span class="kw">struct</span> Array {
+  <span class="dt">void</span>* data_;
+  size_t size_;
+  size_t allocated_;
+  <span class="dt">const</span> TypeInfo* element_info_;
+} Array;
 
-<span class="dt">static</span> <span class="dt">void</span> Array_move(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">void</span>* src) {
-  Array* d = (Array*)dest;
-  Array* s = (Array*)src;
-  assert(d != s);
-  ArrayRelease(d);
-  memcpy(dest, src, <span class="kw">sizeof</span>(Array));
-  memset(src, <span class="dv">0</span>, <span class="kw">sizeof</span>(Array));
-}
+<span class="dt">void</span> TypeInfoInitArray(TypeInfo* info, <span class="dt">const</span> TypeInfo* element_info);
 
-<span class="dt">static</span> <span class="dt">void</span> Array_copy(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">const</span> <span class="dt">void</span>* src) {
-  Array* d = (Array*)dest;
-  Array* s = (Array*)src;
-  assert(d != s);
-  ArrayRelease(d);
-  ArrayInit(d, ArraySize(s), s-&gt;element_info_);
-  <span class="dt">const</span> TypeInfo* info = s-&gt;element_info_;
-  <span class="kw">for</span> (size_t i = <span class="dv">0</span>, n = ArraySize(d); i &lt; n; ++i) {
-    info-&gt;copy_(info-&gt;data_, Offset(d-&gt;data_, i * info-&gt;size_),
-                Offset(s-&gt;data_, i * info-&gt;size_));
-  }
-}
+<span class="dt">void</span> ArrayInit(Array* array, size_t size, <span class="dt">const</span> TypeInfo* element_info);
 
-<span class="dt">void</span> TypeInfoInitArray(TypeInfo* info, <span class="dt">const</span> TypeInfo* element_info) {
-  TypeInfoInitPlain(info, <span class="kw">sizeof</span>(Array));
-  info-&gt;data_ = (<span class="dt">void</span>*)element_info;
-  info-&gt;init_ = Array_init;
-  info-&gt;release_ = Array_release;
-  info-&gt;copy_ = Array_copy;
-  info-&gt;move_ = Array_move;
-}
+<span class="dt">void</span> ArrayRelease(Array* array);
 
-<span class="dt">void</span> ArrayInit(Array* array, size_t size, <span class="dt">const</span> TypeInfo* element_info) {
-  memset(array, <span class="dv">0</span>, <span class="kw">sizeof</span>(Array));
-  array-&gt;element_info_ = element_info;
-  <span class="kw">if</span> (size &gt; <span class="dv">0</span>) {
-    ArrayResize(array, size);
-  }
-}
+<span class="co">// Returns the size of the array, i.e. the number of elements in the array.</span>
+size_t ArraySize(<span class="dt">const</span> Array* array);
 
-<span class="dt">void</span> ArrayRelease(Array* array) {
-  <span class="co">// Resize to 0 to release elements.</span>
-  ArrayResize(array, <span class="dv">0</span>);
-  free(array-&gt;data_);
-  <span class="co">// Leave an empty valid array.</span>
-  ArrayInit(array, <span class="dv">0</span>, array-&gt;element_info_);
-}
+<span class="co">// Resize the array.</span>
+<span class="dt">void</span> ArrayResize(Array* array, size_t new_size);
 
-size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">return</span> array-&gt;size_; }
+<span class="co">// Returns the pointer of element at array with offset i.</span>
+<span class="dt">void</span>* ArrayGet(<span class="dt">const</span> Array* array, size_t i);
 
-<span class="dt">void</span> ArrayResize(Array* array, size_t new_size) {
-  <span class="dt">const</span> TypeInfo* info = array-&gt;element_info_;
-  <span class="kw">if</span> (new_size &lt;= array-&gt;allocated_) {
-    size_t old_size = array-&gt;size_;
-    <span class="kw">for</span> (size_t i = new_size; i &lt; old_size; ++i) {
-      info-&gt;release_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
-    }
-    <span class="kw">for</span> (size_t i = old_size; i &lt; new_size; ++i) {
-      info-&gt;init_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
-    }
-    array-&gt;size_ = new_size;
-    <span class="kw">return</span>;
-  }
-  size_t allocation = new_size;
-  <span class="kw">if</span> (allocation &lt; array-&gt;size_ * <span class="dv">2</span>) {
-    allocation = array-&gt;size_ * <span class="dv">2</span>;
-  }
-  <span class="dt">void</span>* p = malloc(allocation * info-&gt;size_);
-  assert(p);
-  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; new_size; ++i) {
-    info-&gt;init_(info-&gt;data_, Offset(p, i * info-&gt;size_));
-  }
-  size_t common_size = new_size &lt; array-&gt;size_ ? new_size : array-&gt;size_;
-  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; common_size; ++i) {
-    info-&gt;move_(info-&gt;data_, Offset(p, i * info-&gt;size_),
-                Offset(array-&gt;data_, i * info-&gt;size_));
-  }
-  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; array-&gt;size_; ++i) {
-    info-&gt;release_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
-  }
-  free(array-&gt;data_);
-  array-&gt;data_ = p;
-  array-&gt;size_ = new_size;
-  array-&gt;allocated_ = allocation;
-}
+<span class="co">// Erase a sub range from array.</span>
+<span class="dt">void</span> ArrayErase(Array* array, size_t offset, size_t len);
 
-<span class="dt">void</span>* ArrayGet(Array* array, size_t i) {
-  assert(i &lt; ArraySize(array));
-  <span class="kw">return</span> Offset(array-&gt;data_, i * array-&gt;element_info_-&gt;size_);
-}</code></pre></td></tr></table>
+<span class="co">// Insert a sub range with initialized values into array.</span>
+<span class="dt">void</span> ArrayInsertInitValues(Array* array, size_t offset, size_t len);
+
+<span class="co">// Inserts a buffer into array. src should not be conatined by array.</span>
+<span class="dt">void</span> ArrayInsertBuffer(Array* array, size_t offset, <span class="dt">const</span> <span class="dt">void</span>* src,
+                       size_t len);
+
+<span class="co">// Inserts a buffer with values moved into array.</span>
+<span class="dt">void</span> ArrayMoveBuffer(Array* array, size_t offset, <span class="dt">void</span>* src, size_t len);
+
+<span class="co">// Replace dest[dest_offset:dest_len] with src[0:src_len].</span>
+<span class="dt">void</span> ArraySpliceBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                       <span class="dt">const</span> <span class="dt">void</span>* src, size_t src_len);
+
+<span class="co">// Replace dest[dest_offset:dest_len] with src[0:src_len].</span>
+<span class="dt">void</span> ArraySpliceMoveBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                           <span class="dt">void</span>* src, size_t src_len);
+
+<span class="co">// Remove dest[dest_offset...], and copy src[src_offset...] into</span>
+<span class="co">// dest[dest_offset ...]</span>
+<span class="dt">void</span> ArraySplice(Array* dest, size_t dest_offset, size_t dest_len,
+                 <span class="dt">const</span> Array* src, size_t src_offset, size_t src_len);
+
+<span class="co">// Remove dest[dest_offset...], and move src[src_offset...] into</span>
+<span class="co">// dest[dest_offset ...]</span>
+<span class="dt">void</span> ArraySpliceMove(Array* dest, size_t dest_offset, size_t dest_len,
+                     Array* src, size_t src_offset, size_t src_len);
+
+<span class="co">// Remove dest[dest_offset...], and move src[src_offset...] into</span>
+<span class="co">// dest[dest_offset ...], and then erase src[src_offset...].</span>
+<span class="dt">void</span> ArraySpliceCut(Array* dest, size_t dest_offset, size_t dest_len,
+                    Array* src, size_t src_offset, size_t src_len);
+
+<span class="co">// Appends one value into the end of array.</span>
+<span class="dt">void</span> ArrayAppend(Array* array, <span class="dt">void</span>* value);
+
+<span class="co">// Removes last value from array.</span>
+<span class="dt">void</span> ArrayPop(Array* array);
+
+<span class="ot">#endif  </span><span class="co">// FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H</span></code></pre></td></tr></table>
 <h3 id="file-array_test.c"><a href="#file-array_test.c">File array_test.c</a></h3>
 <table class="sourceCode C numberLines" include="array_test.c"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
@@ -720,30 +550,174 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
 132
 133
 134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
 </pre></td><td class="sourceCode"><pre><code class="sourceCode c"><span class="ot">#include &quot;array.h&quot;</span>
 
 <span class="ot">#include &quot;double_array.h&quot;</span>
 
 <span class="ot">#include &lt;stdio.h&gt;</span>
 
+<span class="dt">int</span> test_failed = <span class="dv">0</span>;
+
+<span class="ot">#define EXPECT(cond, format, ...)                                \</span>
+  <span class="kw">if</span> (!(cond)) {                                                 \
+    fprintf(stderr,                                              \
+            <span class="st">&quot;%s %s:%d &quot;</span>                                          \
+            <span class="st">&quot;check &#39;%s&#39; failed:</span><span class="ch">\n</span><span class="st">&quot;</span> format <span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>,                  \
+            __func__, __FILE__, __LINE__, #cond, ##__VA_ARGS__); \
+    test_failed++;                                               \
+  }
+
+<span class="ot">#define ASSERT(cond, format, ...)        \</span>
+  {                                      \
+    <span class="dt">int</span> old_test_failed = test_failed;   \
+    EXPECT(cond, format, ##__VA_ARGS__); \
+    <span class="kw">if</span> (test_failed &gt; old_test_failed) { \
+      <span class="kw">return</span>;                            \
+    }                                    \
+  }
+
+<span class="ot">#define RUN_TEST(test)                         \</span>
+  fprintf(stderr, <span class="st">&quot;==Testing %s ...</span><span class="ch">\n</span><span class="st">&quot;</span>, #test);   \
+  test_failed = <span class="dv">0</span>;                             \
+  test();                                      \
+  <span class="kw">if</span> (test_failed) {                           \
+    fprintf(stderr, <span class="st">&quot;==Failed %s</span><span class="ch">\n\n</span><span class="st">&quot;</span>, #test); \
+  } <span class="kw">else</span> {                                     \
+    fprintf(stderr, <span class="st">&quot;==Passed %s</span><span class="ch">\n\n</span><span class="st">&quot;</span>, #test); \
+  }
+
 <span class="dt">void</span> TestArrayOfDouble() {
   Array a[<span class="dv">1</span>];
   TypeInfo double_info[<span class="dv">1</span>];
   TypeInfoInitPlain(double_info, <span class="kw">sizeof</span>(<span class="dt">double</span>));
   ArrayInit(a, <span class="dv">1</span>, double_info);
-  assert(ArraySize(a) == <span class="dv">1</span>);
+  ASSERT(ArraySize(a) == <span class="dv">1</span>, <span class="st">&quot;array size(%zd) is not 1&quot;</span>, ArraySize(a));
   ArrayResize(a, <span class="dv">10</span>);
-  assert(ArraySize(a) == <span class="dv">10</span>);
+  ASSERT(ArraySize(a) == <span class="dv">10</span>, <span class="st">&quot;array size(%zd) is not 10&quot;</span>, ArraySize(a));
+  <span class="dt">double</span> sum_check = <span class="dv">0</span>;
   <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; <span class="dv">10</span>; ++i) {
     <span class="dt">double</span> v = <span class="fl">1.0</span> / (i + <span class="dv">1</span>);
+    sum_check += v;
+    <span class="dt">double</span>* p = ArrayGet(a, i);
+    ASSERT(*p == <span class="dv">0</span>, <span class="st">&quot;init does not set zero, value %lf&quot;</span>, *p);
     *(<span class="dt">double</span>*)ArrayGet(a, i) = v;
   }
   <span class="dt">double</span> s = <span class="dv">0</span>;
   <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; ArraySize(a); ++i) {
+    <span class="dt">double</span>* p = ArrayGet(a, i);
+    ASSERT(*p == <span class="fl">1.0</span> / (i + <span class="dv">1</span>), <span class="st">&quot;read got %lf does not match last set %lf&quot;</span>, *p,
+           <span class="fl">1.0</span> / (i + <span class="dv">1</span>));
     s += *(<span class="dt">double</span>*)ArrayGet(a, i);
   }
-
-  printf(<span class="st">&quot;In func %s(line %d), sum=%lf</span><span class="ch">\n</span><span class="st">&quot;</span>, __func__, __LINE__, s);
+  ASSERT(s == sum_check, <span class="st">&quot;sum(%lf) does not match(%lf)&quot;</span>, s, sum_check);
 
   ArrayRelease(a);
 }
@@ -755,16 +729,21 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
   TypeInfoInitPlain(double_info, <span class="kw">sizeof</span>(<span class="dt">double</span>));
   TypeInfoInitArray(array_info, double_info);
 
-  size_t m = <span class="dv">40</span>, n = <span class="dv">3</span>;
+  size_t m = <span class="dv">40</span>;
   ArrayInit(a, m - <span class="dv">1</span>, array_info);
-
+  ASSERT(ArraySize(a) == m - <span class="dv">1</span>, <span class="st">&quot;array size(%zd) is not %zd&quot;</span>, ArraySize(a),
+         m - <span class="dv">1</span>);
   ArrayResize(a, m);
+  ASSERT(ArraySize(a) == m, <span class="st">&quot;array size(%zd) is not %zd&quot;</span>, ArraySize(a), m);
 
+  <span class="dt">double</span> sum_check = <span class="dv">0</span>;
   <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; m; ++i) {
     Array* row = (Array*)ArrayGet(a, i);
-    ArrayResize(row, n);
-    <span class="kw">for</span> (size_t j = <span class="dv">0</span>; j &lt; n; ++j) {
+    ASSERT(ArraySize(row) == <span class="dv">0</span>, <span class="st">&quot;array size(%zd) is not 0&quot;</span>, ArraySize(a));
+    ArrayResize(row, i + <span class="dv">1</span>);
+    <span class="kw">for</span> (size_t j = <span class="dv">0</span>; j &lt;= i; ++j) {
       *(<span class="dt">double</span>*)ArrayGet(row, j) = <span class="fl">1.0</span> / (i + j + <span class="dv">1</span>);
+      sum_check += <span class="fl">1.0</span> / (i + j + <span class="dv">1</span>);
     }
   }
 
@@ -775,8 +754,7 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
       s += *(<span class="dt">double</span>*)ArrayGet(row, j);
     }
   }
-
-  printf(<span class="st">&quot;In func %s(line %d), sum=%lf</span><span class="ch">\n</span><span class="st">&quot;</span>, __func__, __LINE__, s);
+  ASSERT(s == sum_check, <span class="st">&quot;sum(%lf) miss match %lf&quot;</span>, s, sum_check);
 
   ArrayRelease(a);
 }
@@ -792,6 +770,7 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
 <span class="dt">void</span> DoubleArray_move(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">void</span>* src) {
   DoubleArray* d = (DoubleArray*)dest;
   DoubleArray* s = (DoubleArray*)src;
+  DoubleArrayRelease(d);
   memmove(d, s, <span class="kw">sizeof</span>(DoubleArray));
   DoubleArrayInit(s, <span class="dv">0</span>);
 }
@@ -819,16 +798,21 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
   TypeInfo double_array_info[<span class="dv">1</span>];
   TypeInfoInitDoubleArray(double_array_info);
 
-  size_t m = <span class="dv">40</span>, n = <span class="dv">3</span>;
+  size_t m = <span class="dv">40</span>;
   ArrayInit(a, m - <span class="dv">1</span>, double_array_info);
-
+  ASSERT(ArraySize(a) == m - <span class="dv">1</span>, <span class="st">&quot;array size(%zd) is not %zd&quot;</span>, ArraySize(a),
+         m - <span class="dv">1</span>);
   ArrayResize(a, m);
+  ASSERT(ArraySize(a) == m, <span class="st">&quot;array size(%zd) is not %zd&quot;</span>, ArraySize(a), m);
 
+  <span class="dt">double</span> sum_check = <span class="dv">0</span>;
   <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; m; ++i) {
     DoubleArray* row = (DoubleArray*)ArrayGet(a, i);
-    DoubleArrayResize(row, n);
-    <span class="kw">for</span> (size_t j = <span class="dv">0</span>; j &lt; n; ++j) {
+    ASSERT(DoubleArraySize(row) == <span class="dv">0</span>, <span class="st">&quot;array size(%zd) is not 0&quot;</span>, ArraySize(a));
+    DoubleArrayResize(row, i + <span class="dv">1</span>);
+    <span class="kw">for</span> (size_t j = <span class="dv">0</span>; j &lt;= i; ++j) {
       DoubleArraySet(row, j, <span class="fl">1.0</span> / (i + j + <span class="dv">1</span>));
+      sum_check += <span class="fl">1.0</span> / (i + j + <span class="dv">1</span>);
     }
   }
 
@@ -839,23 +823,623 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
       s += DoubleArrayGet(row, j);
     }
   }
-
-  printf(<span class="st">&quot;In func %s(line %d), sum=%lf</span><span class="ch">\n</span><span class="st">&quot;</span>, __func__, __LINE__, s);
+  ASSERT(s == sum_check, <span class="st">&quot;sum(%lf) miss match %lf&quot;</span>, s, sum_check);
 
   ArrayRelease(a);
 }
 
+<span class="dt">static</span> <span class="dt">int</span> ExpectArrayDoubleEq(Array* a, <span class="dt">const</span> <span class="dt">double</span>* buf, size_t len) {
+  <span class="dt">int</span> old_test_failed = test_failed;
+  EXPECT(a-&gt;element_info_-&gt;size_ == <span class="kw">sizeof</span>(<span class="dt">double</span>),
+         <span class="st">&quot;The array has elment size %zd, not equal to double %zd&quot;</span>,
+         a-&gt;element_info_-&gt;size_, <span class="kw">sizeof</span>(<span class="dt">double</span>));
+  EXPECT(ArraySize(a) == len, <span class="st">&quot;array size %zd is not %zd&quot;</span>, ArraySize(a), len);
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>, n = ArraySize(a); i &lt; n &amp;&amp; i &lt; len; ++i) {
+    EXPECT(*(<span class="dt">double</span>*)ArrayGet(a, i) == buf[i],
+           <span class="st">&quot;The value %lf at %zd is not %lf&quot;</span>, *(<span class="dt">double</span>*)ArrayGet(a, i), i,
+           buf[i]);
+  }
+  <span class="kw">return</span> old_test_failed == test_failed;
+}
+
+<span class="dt">void</span> TestArraySplice() {
+  Array a[<span class="dv">1</span>], b[<span class="dv">1</span>];
+  TypeInfo double_info[<span class="dv">1</span>];
+  TypeInfoInitPlain(double_info, <span class="kw">sizeof</span>(<span class="dt">double</span>));
+  ArrayInit(a, <span class="dv">0</span>, double_info);
+  ArrayInit(b, <span class="dv">0</span>, double_info);
+  ArraySplice(a, <span class="dv">0</span>, <span class="dv">0</span>, b, <span class="dv">0</span>, <span class="dv">0</span>);
+  ASSERT(ArraySize(a) == <span class="dv">0</span>, <span class="st">&quot;a.size=%zd&quot;</span>, ArraySize(a));
+  ArrayInsertBuffer(a, <span class="dv">0</span>, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">2.2</span>, <span class="fl">3.3</span>, <span class="fl">4.4</span>}, <span class="dv">4</span>);
+  ArrayInsertBuffer(a, <span class="dv">4</span>, (<span class="dt">double</span>[]){<span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">3</span>);
+  ASSERT(
+      ExpectArrayDoubleEq(a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">2.2</span>, <span class="fl">3.3</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">7</span>),
+      <span class="st">&quot;&quot;</span>);
+  ArraySplice(a, <span class="dv">0</span>, <span class="dv">0</span>, b, <span class="dv">0</span>, <span class="dv">0</span>);
+  ASSERT(
+      ExpectArrayDoubleEq(a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">2.2</span>, <span class="fl">3.3</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">7</span>),
+      <span class="st">&quot;&quot;</span>);
+  ArraySplice(a, <span class="dv">1</span>, <span class="dv">0</span>, b, <span class="dv">0</span>, <span class="dv">0</span>);
+  ASSERT(
+      ExpectArrayDoubleEq(a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">2.2</span>, <span class="fl">3.3</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">7</span>),
+      <span class="st">&quot;&quot;</span>);
+  ArraySplice(a, <span class="dv">1</span>, <span class="dv">2</span>, b, <span class="dv">0</span>, <span class="dv">0</span>);
+  ASSERT(ExpectArrayDoubleEq(a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">5</span>), <span class="st">&quot;&quot;</span>);
+
+  ArrayInsertBuffer(b, <span class="dv">0</span>, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">2.2</span>, <span class="fl">3.3</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">7</span>);
+
+  ArraySplice(a, <span class="dv">1</span>, <span class="dv">0</span>, b, <span class="dv">1</span>, <span class="dv">2</span>);
+  ASSERT(
+      ExpectArrayDoubleEq(a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">2.2</span>, <span class="fl">3.3</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">7</span>),
+      <span class="st">&quot;&quot;</span>);
+
+  ArraySplice(a, <span class="dv">1</span>, <span class="dv">2</span>, b, <span class="dv">4</span>, <span class="dv">3</span>);
+  ASSERT(ExpectArrayDoubleEq(
+             a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>, <span class="fl">4.4</span>, <span class="fl">5.5</span>, <span class="fl">6.6</span>, <span class="fl">7.7</span>}, <span class="dv">8</span>),
+         <span class="st">&quot;&quot;</span>);
+
+  ArrayErase(a, <span class="dv">2</span>, <span class="dv">6</span>);
+  ArrayAppend(a, (<span class="dt">double</span>[]){<span class="fl">2.8</span>});
+  ASSERT(ExpectArrayDoubleEq(a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">5.5</span>, <span class="fl">2.8</span>}, <span class="dv">3</span>), <span class="st">&quot;&quot;</span>);
+
+  ArrayPop(a);
+  ASSERT(ExpectArrayDoubleEq(a, (<span class="dt">double</span>[]){<span class="fl">1.1</span>, <span class="fl">5.5</span>}, <span class="dv">2</span>), <span class="st">&quot;&quot;</span>);
+
+  ArrayRelease(a);
+  ArrayRelease(b);
+}
+
 <span class="dt">int</span> main(<span class="dt">int</span> argc, <span class="dt">char</span>* argv[]) {
-  TestArrayOfDouble();
+  RUN_TEST(TestArrayOfDouble);
 
-  TestArrayOfArray();
+  RUN_TEST(TestArrayOfArray);
 
-  TestArrayOfDoubleArray();
+  RUN_TEST(TestArrayOfDoubleArray);
+
+  RUN_TEST(TestArraySplice);
 
   <span class="kw">return</span> <span class="dv">0</span>;
 }</code></pre></td></tr></table>
-<p><span class="label label-default">Problem</span>: Implement <code class="sourceCode c">ArraySplice</code>, which replace a continuous sub range of one array with range in another array.</p>
-<p><code class="sourceCode c"><span class="dt">void</span> ArraySplice(Array* dest, size_t dest_offset, size_t dest_len, Array* src, size_t src_offset, size_t src_len)</code>.</p>
+<h3 id="file-array.c"><a href="#file-array.c">File array.c</a></h3>
+<p>Before reading this file, you are encouraged to implement yourself version, to make array_test pass, see <a href="#problems">Problems</a> sections.</p>
+<table class="sourceCode C numberLines" include="array.c"><tr class="sourceCode"><td class="lineNumbers"><pre>1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+</pre></td><td class="sourceCode"><pre><code class="sourceCode c"><span class="ot">#include &quot;array.h&quot;</span>
+
+<span class="ot">#include &lt;stdint.h&gt;</span>
+
+<span class="dt">static</span> <span class="dt">void</span> Plain_copy(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">const</span> <span class="dt">void</span>* src) {
+  memcpy(dest, src, (intptr_t)data);
+}
+
+<span class="dt">static</span> <span class="dt">void</span> Plain_move(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">void</span>* src) {
+  memmove(dest, src, (intptr_t)data);
+}
+
+<span class="dt">static</span> <span class="dt">void</span> Plain_init(<span class="dt">void</span>* data, <span class="dt">void</span>* p) { memset(p, <span class="dv">0</span>, (intptr_t)data); }
+
+<span class="dt">static</span> <span class="dt">void</span> Plain_release(<span class="dt">void</span>* data, <span class="dt">void</span>* p) { memset(p, <span class="dv">0</span>, (intptr_t)data); }
+
+<span class="dt">void</span> TypeInfoInitPlain(TypeInfo* info, size_t size) {
+  memset(info, <span class="dv">0</span>, <span class="kw">sizeof</span>(TypeInfo));
+  info-&gt;data_ = (<span class="dt">void</span>*)(intptr_t)size;
+  info-&gt;size_ = size;
+  info-&gt;init_ = Plain_init;
+  info-&gt;release_ = Plain_release;
+  info-&gt;copy_ = Plain_copy;
+  info-&gt;move_ = Plain_move;
+}
+
+<span class="co">// A help routine.</span>
+<span class="dt">static</span> <span class="kw">inline</span> <span class="dt">void</span>* Offset(<span class="dt">const</span> <span class="dt">void</span>* data, size_t n) {
+  <span class="kw">return</span> &amp;((<span class="dt">char</span>*)data)[n];
+}
+
+<span class="dt">static</span> <span class="dt">void</span> Array_init(<span class="dt">void</span>* data, <span class="dt">void</span>* p) {
+  ArrayInit(p, <span class="dv">0</span>, (TypeInfo*)data);
+}
+
+<span class="dt">static</span> <span class="dt">void</span> Array_release(<span class="dt">void</span>* data, <span class="dt">void</span>* p) {
+  assert(data == ((Array*)p)-&gt;element_info_);
+  ArrayRelease(p);
+}
+
+<span class="dt">static</span> <span class="dt">void</span> Array_move(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">void</span>* src) {
+  Array* d = (Array*)dest;
+  Array* s = (Array*)src;
+  assert(d != s);
+  assert(data == ((Array*)d)-&gt;element_info_);
+  assert(data == ((Array*)s)-&gt;element_info_);
+  <span class="co">// Swap *d and *s.</span>
+  Array t = *d;
+  *d = *s;
+  *s = t;
+}
+
+<span class="dt">static</span> <span class="dt">void</span> Array_copy(<span class="dt">void</span>* data, <span class="dt">void</span>* dest, <span class="dt">const</span> <span class="dt">void</span>* src) {
+  Array* d = (Array*)dest;
+  Array* s = (Array*)src;
+  assert(d != s);
+  assert(data == ((Array*)d)-&gt;element_info_);
+  assert(data == ((Array*)s)-&gt;element_info_);
+  ArraySplice(d, <span class="dv">0</span>, ArraySize(d), s, <span class="dv">0</span>, ArraySize(s));
+}
+
+<span class="dt">void</span> TypeInfoInitArray(TypeInfo* info, <span class="dt">const</span> TypeInfo* element_info) {
+  TypeInfoInitPlain(info, <span class="kw">sizeof</span>(Array));
+  info-&gt;data_ = (<span class="dt">void</span>*)element_info;
+  info-&gt;init_ = Array_init;
+  info-&gt;release_ = Array_release;
+  info-&gt;copy_ = Array_copy;
+  info-&gt;move_ = Array_move;
+}
+
+<span class="dt">void</span> ArrayInit(Array* array, size_t size, <span class="dt">const</span> TypeInfo* element_info) {
+  memset(array, <span class="dv">0</span>, <span class="kw">sizeof</span>(Array));
+  array-&gt;element_info_ = element_info;
+  <span class="kw">if</span> (size &gt; <span class="dv">0</span>) {
+    ArrayResize(array, size);
+  }
+}
+
+<span class="dt">void</span> ArrayRelease(Array* array) {
+  <span class="co">// Resize to 0 to release elements.</span>
+  ArrayResize(array, <span class="dv">0</span>);
+  free(array-&gt;data_);
+  <span class="co">// Leave an empty valid array.</span>
+  ArrayInit(array, <span class="dv">0</span>, array-&gt;element_info_);
+}
+
+size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">return</span> array-&gt;size_; }
+
+<span class="dt">void</span> ArrayResize(Array* array, size_t new_size) {
+  <span class="dt">const</span> TypeInfo* info = array-&gt;element_info_;
+  <span class="kw">if</span> (new_size &lt;= array-&gt;allocated_) {
+    size_t old_size = array-&gt;size_;
+    <span class="kw">for</span> (size_t i = new_size; i &lt; old_size; ++i) {
+      info-&gt;release_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
+    }
+    <span class="kw">for</span> (size_t i = old_size; i &lt; new_size; ++i) {
+      info-&gt;init_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
+    }
+    array-&gt;size_ = new_size;
+    <span class="kw">return</span>;
+  }
+  size_t allocation = new_size;
+  <span class="kw">if</span> (allocation &lt; array-&gt;size_ * <span class="dv">2</span>) {
+    allocation = array-&gt;size_ * <span class="dv">2</span>;
+  }
+  <span class="dt">void</span>* p = malloc(allocation * info-&gt;size_);
+  assert(p);
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; new_size; ++i) {
+    info-&gt;init_(info-&gt;data_, Offset(p, i * info-&gt;size_));
+  }
+  size_t common_size = new_size &lt; array-&gt;size_ ? new_size : array-&gt;size_;
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; common_size; ++i) {
+    info-&gt;move_(info-&gt;data_, Offset(p, i * info-&gt;size_),
+                Offset(array-&gt;data_, i * info-&gt;size_));
+  }
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; array-&gt;size_; ++i) {
+    info-&gt;release_(info-&gt;data_, Offset(array-&gt;data_, i * info-&gt;size_));
+  }
+  free(array-&gt;data_);
+  array-&gt;data_ = p;
+  array-&gt;size_ = new_size;
+  array-&gt;allocated_ = allocation;
+}
+
+<span class="dt">void</span>* ArrayGet(<span class="dt">const</span> Array* array, size_t i) {
+  assert(i &lt; ArraySize(array));
+  <span class="kw">return</span> Offset(array-&gt;data_, i * array-&gt;element_info_-&gt;size_);
+}
+
+<span class="dt">void</span> ArrayErase(Array* array, size_t offset, size_t len) {
+  assert(offset + len &lt;= ArraySize(array));
+  <span class="kw">if</span> (!len) {
+    <span class="kw">return</span>;
+  }
+  <span class="dt">const</span> TypeInfo* info = array-&gt;element_info_;
+  size_t old_size = ArraySize(array);
+  <span class="kw">for</span> (size_t i = offset + len; i &lt; old_size; ++i) {
+    info-&gt;move_(info-&gt;data_, Offset(array-&gt;data_, (i - len) * info-&gt;size_),
+                Offset(array-&gt;data_, i * info-&gt;size_));
+  }
+  ArrayResize(array, old_size - len);
+}
+
+<span class="dt">void</span> ArrayInsertInitValues(Array* array, size_t offset, size_t len) {
+  assert(offset &lt;= ArraySize(array));
+  <span class="kw">if</span> (!len) {
+    <span class="kw">return</span>;
+  }
+  <span class="dt">const</span> TypeInfo* info = array-&gt;element_info_;
+  size_t old_size = ArraySize(array);
+  ArrayResize(array, old_size + len);
+  <span class="kw">for</span> (size_t i = old_size; i-- &gt; offset;) {
+    info-&gt;move_(info-&gt;data_, Offset(array-&gt;data_, (i + len) * info-&gt;size_),
+                Offset(array-&gt;data_, i * info-&gt;size_));
+  }
+}
+
+<span class="dt">void</span> ArrayInsertBuffer(Array* array, size_t offset, <span class="dt">const</span> <span class="dt">void</span>* src,
+                       size_t len) {
+  assert(offset &lt;= ArraySize(array));
+  <span class="kw">if</span> (!len) {
+    <span class="kw">return</span>;
+  }
+  <span class="dt">const</span> TypeInfo* info = array-&gt;element_info_;
+  ArrayInsertInitValues(array, offset, len);
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; len; ++i) {
+    info-&gt;copy_(info-&gt;data_, Offset(array-&gt;data_, (i + offset) * info-&gt;size_),
+                Offset(src, i * info-&gt;size_));
+  }
+}
+
+<span class="dt">void</span> ArrayMoveBuffer(Array* array, size_t offset, <span class="dt">void</span>* src, size_t len) {
+  assert(offset &lt;= ArraySize(array));
+  <span class="kw">if</span> (!len) {
+    <span class="kw">return</span>;
+  }
+  <span class="dt">const</span> TypeInfo* info = array-&gt;element_info_;
+  ArrayInsertInitValues(array, offset, len);
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; len; ++i) {
+    info-&gt;move_(info-&gt;data_, Offset(array-&gt;data_, (i + offset) * info-&gt;size_),
+                Offset(src, i * info-&gt;size_));
+  }
+}
+
+<span class="dt">void</span> ArraySpliceBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                       <span class="dt">const</span> <span class="dt">void</span>* src, size_t src_len) {
+  assert(dest_offset + dest_len &lt;= ArraySize(dest));
+  <span class="dt">const</span> TypeInfo* info = dest-&gt;element_info_;
+  size_t old_size = ArraySize(dest);
+  size_t common_len = dest_len &lt; src_len ? dest_len : src_len;
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; common_len; ++i) {
+    info-&gt;copy_(info-&gt;data_,
+                Offset(dest-&gt;data_, (i + dest_offset) * info-&gt;size_),
+                Offset(src, i * info-&gt;size_));
+  }
+  <span class="kw">if</span> (src_len &lt; dest_len) {
+    ArrayErase(dest, dest_offset + src_len, dest_len - src_len);
+  } <span class="kw">else</span> <span class="kw">if</span> (src_len &gt; dest_len) {
+    ArrayInsertBuffer(dest, dest_offset + dest_len,
+                      Offset(src, dest_len * info-&gt;size_), src_len - dest_len);
+  }
+  assert(ArraySize(dest) == old_size + src_len - dest_len);
+}
+
+<span class="dt">void</span> ArraySpliceMoveBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                           <span class="dt">void</span>* src, size_t src_len) {
+  assert(dest_offset + dest_len &lt;= ArraySize(dest));
+  <span class="dt">const</span> TypeInfo* info = dest-&gt;element_info_;
+  size_t old_size = ArraySize(dest);
+  size_t common_len = dest_len &lt; src_len ? dest_len : src_len;
+  <span class="kw">for</span> (size_t i = <span class="dv">0</span>; i &lt; common_len; ++i) {
+    info-&gt;move_(info-&gt;data_,
+                Offset(dest-&gt;data_, (i + dest_offset) * info-&gt;size_),
+                Offset(src, i * info-&gt;size_));
+  }
+  <span class="kw">if</span> (src_len &lt; dest_len) {
+    ArrayErase(dest, dest_offset + src_len, dest_len - src_len);
+  } <span class="kw">else</span> <span class="kw">if</span> (src_len &gt; dest_len) {
+    ArrayMoveBuffer(dest, dest_offset + dest_len,
+                    Offset(src, dest_len * info-&gt;size_), src_len - dest_len);
+  }
+  assert(ArraySize(dest) == old_size + src_len - dest_len);
+}
+
+<span class="dt">void</span> ArraySplice(Array* dest, size_t dest_offset, size_t dest_len,
+                 <span class="dt">const</span> Array* src, size_t src_offset, size_t src_len) {
+  assert(dest_offset + dest_len &lt;= ArraySize(dest));
+  assert(dest-&gt;element_info_ == src-&gt;element_info_);
+  assert(src_offset + src_len &lt;= ArraySize(src));
+  assert(dest-&gt;element_info_ == src-&gt;element_info_);
+  ArraySpliceBuffer(dest, dest_offset, dest_len,
+                    src_len ? ArrayGet(src, src_offset) : NULL, src_len);
+}
+
+<span class="dt">void</span> ArraySpliceMove(Array* dest, size_t dest_offset, size_t dest_len,
+                     Array* src, size_t src_offset, size_t src_len) {
+  assert(dest_offset + dest_len &lt;= ArraySize(dest));
+  assert(dest-&gt;element_info_ == src-&gt;element_info_);
+  assert(src_offset + src_len &lt;= ArraySize(src));
+  assert(dest-&gt;element_info_ == src-&gt;element_info_);
+  ArraySpliceMoveBuffer(dest, dest_offset, dest_len,
+                        src_len ? ArrayGet(src, src_offset) : NULL, src_len);
+}
+
+<span class="dt">void</span> ArraySpliceCut(Array* dest, size_t dest_offset, size_t dest_len,
+                    Array* src, size_t src_offset, size_t src_len) {
+  ArraySpliceMove(dest, dest_offset, dest_len, src, src_offset, src_len);
+  ArrayErase(src, src_offset, src_len);
+}
+
+<span class="dt">void</span> ArrayAppend(Array* a, <span class="dt">void</span>* value) {
+  ArrayInsertBuffer(a, ArraySize(a), value, <span class="dv">1</span>);
+}
+
+<span class="dt">void</span> ArrayPop(Array* array) {
+  assert(ArraySize(array) &gt; <span class="dv">0</span>);
+  ArrayResize(array, ArraySize(array) - <span class="dv">1</span>);
+}</code></pre></td></tr></table>
+<h1 id="compile-and-test"><a href="#compile-and-test">Compile and test</a></h1>
+<p>Assume we copy the relative code to file <code>double_array.h</code>, <code>array.h</code>, <code>array.c</code> and <code>array_test.c</code> respectively, this code can be compiled and tested as:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="co"># clang can be replacce by gcc, or cc</span>
+<span class="kw">clang</span> -std=c11 -Wall -O0 -g array_test.cc array.c -o array_test
+<span class="kw">./arary_test</span>
+<span class="co"># If valgrind is installed.</span>
+<span class="kw">valgrind</span> ./array_test</code></pre>
+<p>If you implement yourself version <code>array.c</code> in another file <code>array_ya.c</code>, then it can be tested as:</p>
+<pre class="sourceCode bash"><code class="sourceCode bash"><span class="kw">clang</span> -std=c11 -Wall -O0 -g array_test.cc array_ya.c -o array_ya_test
+<span class="kw">./arary_ya_test</span>
+<span class="co"># If valgrind is installed.</span>
+<span class="kw">valgrind</span> ./array_ya_test</code></pre>
+<h1 id="problems"><a href="#problems">Problems</a></h1>
+<p><span class="label label-default">Problem</span> This code is not tested, please write some code to test this implementation.</p>
+<p><span class="label label-default">Problem</span> Implement <code class="sourceCode c"><span class="dt">double</span> Sum(DoubleArray*array)</code>, returns the summation of all values in the array.</p>
+<p><span class="label label-default">Problem</span> Implement <code class="sourceCode c">size_t ArgMax(DoubleArray*array)</code>, which returns the index of max value in the array, and returns zero for empty array.</p>
+<p><span class="label label-default">Problem</span> Implement <code class="sourceCode c"><span class="dt">void</span> DoubleArrayAppend(DoubleArray* array, <span class="dt">double</span> v)</code> based on the other access methods in above, without touching <code>DoubleArray</code> fields.</p>
+<p><span class="label label-default">Problem</span> Since the <code>DoubleArray</code>'s implementation is quite simple, we can copy code and rename the type for <code>IntArray</code>, <code>Int64Array</code>. Try to define a macro <code>PLAIN_ARRAY(name, type)</code>, which generate array code automatically. For example, <code>PLAIN_ARRAY(DoubleArray, double)</code> can generate the code for <code>DoubleArray</code>, <code>PLAIN_ARRAY(IVec, int)</code> generate code for int array, with all methods prefixed by IVec.</p>
+<p><span class="label label-default">Problem</span> Re-implement all <code class="sourceCode c">Array</code> methods.</p>
+<p><span class="label label-default">Problem</span> Implement a function to swap two non interleaved ranges of array:</p>
+<p><code class="sourceCode c"><span class="dt">void</span> ArraySwapRanges(Array* array, size_t first_offset, size_t first_len, size_t second_offset, size_t second_len)</code></p>
+<p>For example, for arary <code>[1, 2, 3, 4, 5, 6, 7, 8]</code>, calling <code class="sourceCode c">ArraySwapRanges(array, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">3</span>)</code> will modifiy the array into <code>[1, 5, 6, 7, 4, 2, 3, 8]</code>.</p>
                   </div>
                 <div id="TOC" class="col-md-3">
           <nav class="affix">
@@ -868,10 +1452,12 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
             </ul></li>
             <li><a href="#general-type-array">General type Array</a><ul>
             <li><a href="#file-array.h">File array.h</a></li>
-            <li><a href="#file-array.c">File array.c</a></li>
             <li><a href="#file-array_test.c">File array_test.c</a></li>
+            <li><a href="#file-array.c">File array.c</a></li>
             </ul></li>
             </ul></li>
+            <li><a href="#compile-and-test">Compile and test</a></li>
+            <li><a href="#problems">Problems</a></li>
             </ul>
           </nav>
         </div>

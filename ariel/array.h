@@ -48,6 +48,48 @@ size_t ArraySize(const Array* array);
 void ArrayResize(Array* array, size_t new_size);
 
 // Returns the pointer of element at array with offset i.
-void* ArrayGet(Array* array, size_t i);
+void* ArrayGet(const Array* array, size_t i);
+
+// Erase a sub range from array.
+void ArrayErase(Array* array, size_t offset, size_t len);
+
+// Insert a sub range with initialized values into array.
+void ArrayInsertInitValues(Array* array, size_t offset, size_t len);
+
+// Inserts a buffer into array. src should not be conatined by array.
+void ArrayInsertBuffer(Array* array, size_t offset, const void* src,
+                       size_t len);
+
+// Inserts a buffer with values moved into array.
+void ArrayMoveBuffer(Array* array, size_t offset, void* src, size_t len);
+
+// Replace dest[dest_offset:dest_len] with src[0:src_len].
+void ArraySpliceBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                       const void* src, size_t src_len);
+
+// Replace dest[dest_offset:dest_len] with src[0:src_len].
+void ArraySpliceMoveBuffer(Array* dest, size_t dest_offset, size_t dest_len,
+                           void* src, size_t src_len);
+
+// Remove dest[dest_offset...], and copy src[src_offset...] into
+// dest[dest_offset ...]
+void ArraySplice(Array* dest, size_t dest_offset, size_t dest_len,
+                 const Array* src, size_t src_offset, size_t src_len);
+
+// Remove dest[dest_offset...], and move src[src_offset...] into
+// dest[dest_offset ...]
+void ArraySpliceMove(Array* dest, size_t dest_offset, size_t dest_len,
+                     Array* src, size_t src_offset, size_t src_len);
+
+// Remove dest[dest_offset...], and move src[src_offset...] into
+// dest[dest_offset ...], and then erase src[src_offset...].
+void ArraySpliceCut(Array* dest, size_t dest_offset, size_t dest_len,
+                    Array* src, size_t src_offset, size_t src_len);
+
+// Appends one value into the end of array.
+void ArrayAppend(Array* array, void* value);
+
+// Removes last value from array.
+void ArrayPop(Array* array);
 
 #endif  // FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H

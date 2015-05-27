@@ -8,5 +8,5 @@ $(generated_htmls): %.html: %.md include.hs template.html
 ds_array.html: array_test
 
 array_test: array_test.c array.c array.h double_array.h
-	clang -Wall -O0 -g array_test.c array.c -o $@
+	clang -std=c11 -Wall -O0 -g array_test.c array.c -o $@
 	valgrind ./array_test
