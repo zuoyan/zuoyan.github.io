@@ -67,9 +67,9 @@ table.sourceCode pre {
        <h1 class="title">Tutorial, Array</h1> 
       <div class="row">
         <div class="col-md-9">
-                    <h1 id="data-structure-array">Data structure, Array</h1>
+                    <h1 id="data-structure-array"><a href="#data-structure-array">Data structure, Array</a></h1>
 <p>In this tutorial, we define array interfaces and try to implement them in C.</p>
-<h1 id="what-is-an-array">What is an Array</h1>
+<h1 id="what-is-an-array"><a href="#what-is-an-array">What is an Array</a></h1>
 <p>Array is a container holding multiple values of the same type, and can be read, written with random offset.</p>
 <p>Generally, array should support constant time complexity in random access(read and write). An array that supports resize is a dynamic array, otherwise, it is a static size array.</p>
 <p>In C++, array is implemented as <a href="http://en.cppreference.com/w/cpp/container/vector">std::vector</a>. In Python, array is implemented as list. In C, you have to do it yourself.</p>
@@ -99,11 +99,12 @@ table.sourceCode pre {
 </ul>
 <p>Compare this list with the general array, we have simpler and type safe read and write methods. Since it can only be used for double, the implementation can be much simple, and has best performance. In C, a common approach to achieve type safe and best runtime performance, without code duplication for every type, is using preprocessor macro.</p>
 <p>Based on these primitive methods, it is quite easy and straight to support more methods, like append an element, insert an element, erase an element, append an array, insert an array, erase an slice.</p>
-<h1 id="array-in-c">Array in C</h1>
+<h1 id="array-in-c"><a href="#array-in-c">Array in C</a></h1>
 <p>Let us start from the simpler version, a static plain type array.</p>
-<h2 id="single-plain-type-array">Single plain type Array</h2>
+<h2 id="single-plain-type-array"><a href="#single-plain-type-array">Single plain type Array</a></h2>
 <p>Following C++, We call a type is a plain type, if we do not need to construct and destruct it, the data can be copied from one to another value by memory.</p>
 <p>In C, we need to manage all memory manually. In the implementation of <code>DoubleArray</code>, we need to call <code>DoubleArrayInit</code> to initialize an array, and <code>DoubleArrayRelease</code> to release memory allocated intenrally by the array.</p>
+<h3 id="file-double_array.h"><a href="#file-double_array.h">File double_array.h</a></h3>
 <table class="sourceCode C numberLines" include="double_array.h"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
@@ -221,10 +222,10 @@ table.sourceCode pre {
 <p><span class="label label-default">Problem</span>: Implement <code class="sourceCode c">size_t ArgMax(DoubleArray*array)</code>, which returns the index of max value in the array, and returns zero for empty array.</p>
 <p><span class="label label-default">Problem</span>: Implement <code class="sourceCode c"><span class="dt">void</span> DoubleArrayAppend(DoubleArray* array, <span class="dt">double</span> v)</code> based on the other access methods in above, without touching <code>DoubleArray</code> fields.</p>
 <p><span class="label label-default">Problem</span>: Since this implementation is quite simple, we can copy code and rename the type for <code>IntArray</code>, <code>Int64Array</code>. Try to define a macro <code>PLAIN_ARRAY(name, type)</code>, which generate array code automatically. For example, <code>PLAIN_ARRAY(DoubleArray, double)</code> can generate above code, <code>PLAIN_ARRAY(IVec, int)</code> generate code for int array, with all methods prefixed by IVec.</p>
-<h2 id="general-type-array">General type Array</h2>
+<h2 id="general-type-array"><a href="#general-type-array">General type Array</a></h2>
 <p>To implement a general type Array, we need to abstract some common routines to manage data of a dynamic type. We need pass these routines in the <code>ArrayInit</code>, and in <code>ArrayRelease</code>, we also need to release resources allocated by array elements. The initialization and release might also happen in array management, like resize, append, erase.</p>
 <p>We abstract a general type management routines as struct <code>TypeInfo</code>, and believe this can be allocated statistically(or in stack), so a const pointer of TypeInfo can be passed to <code>ArrayInit</code> without life time problem.</p>
-<h3 id="file-array.h">File array.h</h3>
+<h3 id="file-array.h"><a href="#file-array.h">File array.h</a></h3>
 <table class="sourceCode C numberLines" include="array.h"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
@@ -331,7 +332,7 @@ size_t ArraySize(<span class="dt">const</span> Array* array);
 <span class="dt">void</span>* ArrayGet(Array* array, size_t i);
 
 <span class="ot">#endif  </span><span class="co">// FILE_77037415_78E5_414C_9AB9_A332A85C2B3B_H</span></code></pre></td></tr></table>
-<h3 id="file-array.c">File array.c</h3>
+<h3 id="file-array.c"><a href="#file-array.c">File array.c</a></h3>
 <table class="sourceCode C numberLines" include="array.c"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
@@ -586,7 +587,7 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
   assert(i &lt; ArraySize(array));
   <span class="kw">return</span> Offset(array-&gt;data_, i * array-&gt;element_info_-&gt;size_);
 }</code></pre></td></tr></table>
-<h3 id="file-array_test.c">file array_test.c</h3>
+<h3 id="file-array_test.c"><a href="#file-array_test.c">File array_test.c</a></h3>
 <table class="sourceCode C numberLines" include="array_test.c"><tr class="sourceCode"><td class="lineNumbers"><pre>1
 2
 3
@@ -864,11 +865,13 @@ size_t ArraySize(<span class="dt">const</span> Array* array) { <span class="kw">
             <li><a href="#data-structure-array">Data structure, Array</a></li>
             <li><a href="#what-is-an-array">What is an Array</a></li>
             <li><a href="#array-in-c">Array in C</a><ul>
-            <li><a href="#single-plain-type-array">Single plain type Array</a></li>
+            <li><a href="#single-plain-type-array">Single plain type Array</a><ul>
+            <li><a href="#file-double_array.h">File double_array.h</a></li>
+            </ul></li>
             <li><a href="#general-type-array">General type Array</a><ul>
             <li><a href="#file-array.h">File array.h</a></li>
             <li><a href="#file-array.c">File array.c</a></li>
-            <li><a href="#file-array_test.c">file array_test.c</a></li>
+            <li><a href="#file-array_test.c">File array_test.c</a></li>
             </ul></li>
             </ul></li>
             </ul>

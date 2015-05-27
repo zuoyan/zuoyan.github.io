@@ -85,8 +85,8 @@ In C, we need to manage all memory manually. In the implementation of
 `DoubleArray`, we need to call `DoubleArrayInit` to initialize an array, and
 `DoubleArrayRelease` to release memory allocated intenrally by the array.
 
+### File double_array.h
 ~~~ {.C .numberLines include=double_array.h}
-
 ~~~
 
 <span class="label label-default">Problem</span>: This code is not tested, please write some code to test this implementation.
@@ -130,7 +130,7 @@ can be passed to `ArrayInit` without life time problem.
 array.c
 ~~~
 
-### file array_test.c
+### File array_test.c
 
 ~~~ {.C .numberLines include=array_test.c}
 ~~~
