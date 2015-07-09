@@ -2,8 +2,8 @@ generated_htmls = ds_array.html
 
 all: $(generated_htmls) array_test
 
-$(generated_htmls): %.html: %.md include.hs template.html
-	pandoc --template template.html --toc --filter ./include.hs -t html5 $< -o $@
+$(generated_htmls): %.html: %.md ../template/include.hs ../ariel/template.html
+	pandoc --template ../template/template.html --toc --filter ../template/include.hs -t html5 $< -o $@
 
 ds_array.html: array_test
 
