@@ -2,11 +2,9 @@
 % Unknown
 % 2015-07-09
 
-# 易
-
 TODO: Finish this with links and source information.
 
-## ䷀乾 - Qian
+# ䷀乾 - Qian
 
   
 乾：元亨，利貞。
@@ -142,7 +140,7 @@ The great man is he who is in harmony, in his attributes, with heaven and earth;
 The force of that phrase--'exceeding the proper limits'--indicates the knowing to advance but not to retire; to maintain but not to let perish to get but not to lose. He only is the sage who knows to advance and to retire, to maintain and to let perish; and that without ever acting incorrectly. Yes, he only is the sage!
 
 
-## ䷁坤 - Kun
+# ䷁坤 - Kun
 
   
 坤：元亨，利牝馬之貞。君子有攸往，先迷後得主，利西南得朋，東北喪朋。安貞，吉。
@@ -238,7 +236,7 @@ The superior man (emblemed here) by the yellow and correct (colour), is possesse
 (The subject of) the yin (or divided line) thinking himself equal to the (subject of the) yang, or undivided line, there is sure to be 'a contest.' As if indignant at there being no acknowledgment of the (superiority of the subject of the) yang line, (the text) uses the term 'dragons.' But still the (subject of neither line) can leave his class, and hence we have 'the blood' mentioned. The mention of that as being (both) 'azure and yellow' indicates the mixture of heaven and earth. Heaven's (colour) is azure and earth's is yellow.
 
 
-## ䷂屯 - Zhun
+# ䷂屯 - Zhun
 
   
 屯：元亨，利貞，勿用有攸往，利建侯。
@@ -302,7 +300,7 @@ The topmost SIX, divided, shows (its subject) with the horses of his chariot obl
 'He weeps tears of blood in streams:' - how can the state (thus emblemed) continue long?
 
 
-## ䷃蒙 - Meng
+# ䷃蒙 - Meng
 
   
 蒙：亨。匪我求童蒙，童蒙求我。初筮告，再三瀆，瀆則不告。利貞。
@@ -366,7 +364,7 @@ In the topmost NINE, undivided, we see one smiting the ignorant (youth). But no 
 'Advantage will come from warding off injury:' - (the subject of this line) above and (the ignorant) below, all do and are done to in accordance with their nature.
 
 
-## ䷄需 - Xu
+# ䷄需 - Xu
 
   
 需：有孚，光亨，貞吉。利涉大川。
@@ -430,7 +428,7 @@ The topmost SIX, divided, shows its subject entered into the cavern. (But) there
 'Guests come unurged (to give their help), and if (the subject of the line) receive them respectfully, there will be good fortune in the end:' - though the occupant and the place are not suited to each other, there has been no great failure (in what has been done).
 
 
-## ䷅訟 - Song
+# ䷅訟 - Song
 
   
 訟：有孚，窒。惕中吉。終凶。利見大人，不利涉大川。
@@ -494,7 +492,7 @@ The topmost NINE, undivided, shows how its subject may have the leathern belt co
 'He receives the robe through his contention:' - but still be is not deserving of respect.
 
 
-## ䷆師 - Shi
+# ䷆師 - Shi
 
   
 師：貞，丈人，吉无咎。
@@ -558,7 +556,7 @@ The topmost SIX, divided, shows the great ruler delivering his charges, (appoint
 'The great ruler delivers his charges:' - thereby he rightly apportions merit. 'Small men should not be employed:' - they are sure to throw the states into confusion.
 
 
-## ䷇比 - Bi
+# ䷇比 - Bi
 
   
 比：吉。原筮元永貞，无咎。不寧方來，後夫凶。
@@ -622,7 +620,7 @@ In the topmost SIX, divided, we see one seeking union and attachment without hav
 'He seeks union and attachment without taking the first (step to such an end):' - there is no possibility of a (good) issue.
 
 
-## ䷈小畜 - Xiao Xu
+# ䷈小畜 - Xiao Xu
 
   
 小畜：亨。密雲不雨，自我西郊。
@@ -686,7 +684,7 @@ The topmost NINE, undivided, shows how the rain has fallen, and the (onward prog
 'The rain has fallen and (the onward progress) is stayed:' - the power (denoted in the figure) has accumulated to the full. 'If the superior man prosecute his measures, there will be evil:' - he will find himself obstructed.
 
 
-## ䷉履 - Lu
+# ䷉履 - Lu
 
   
 履虎尾，不咥人，亨。
@@ -750,7 +748,7 @@ The sixth NINE, undivided, tells us to look at (the whole course) that is trodde
 'There will be great good fortune,' and that in the occupancy of the topmost line: - this is great matter for congratulation.
 
 
-## ䷊泰 - Tai
+# ䷊泰 - Tai
 
   
 泰：小往大來，吉亨。
@@ -814,7 +812,7 @@ The sixth six, divided, shows us the city wall returned into the moat. It is not
 'The city wall returned back into the moat' shows how the (governmental) orders have (long) been in disorder.
 
 
-## ䷋否 - Pi
+# ䷋否 - Pi
 
   
 否之匪人，不利君子貞，大往小來。
@@ -878,7 +876,7 @@ The sixth NINE, undivided, shows the overthrow (and removal of) the condition of
 'The distress and obstruction having reached its end, it is overthrown and removed:' - how could it be prolonged?
 
 
-## ䷌同人 - Tong Ren
+# ䷌同人 - Tong Ren
 
   
 同人于野，亨。利涉大川，利君子貞。
@@ -942,7 +940,7 @@ The topmost NINE, undivided, (shows the representative of) the union of men in t
 '(The representative of) the union of men appears in the suburbs:' - his object has not yet been attained.
 
 
-## ䷍大有 - Da You
+# ䷍大有 - Da You
 
   
 大有：元亨。
@@ -1006,7 +1004,7 @@ The topmost NINE, undivided, shows its subject with help accorded to him from He
 'The good fortune attached to the topmost line of Da You' arises from the help of Heaven.
 
 
-## ䷎謙 - Qian
+# ䷎謙 - Qian
 
   
 謙：亨，君子有終。
@@ -1070,7 +1068,7 @@ The sixth SIX, divided, shows us humility that has made itself recognised. The s
 'His humility has made itself recognised:' - (but) all his aims have not yet been attained. He may employ the force of arms, (but only) in correcting (his own) towns and state.'
 
 
-## ䷏豫 - Yu
+# ䷏豫 - Yu
 
   
 豫：利建侯，行師。
@@ -1134,7 +1132,7 @@ The topmost six, divided, shows its subject with darkened mind devoted to the pl
 'With darkened mind devoted to the harmony and satisfaction (of the time),' as shown in the topmost (line): - how can one in such a condition continue long?
 
 
-## ䷐隨 - Sui
+# ䷐隨 - Sui
 
   
 隨：元亨利貞，无咎。
@@ -1198,7 +1196,7 @@ The topmost SIX, divided, shows us (that sincerity) firmly held and clung to, ye
 'The sincerity is firmly held and clung to, as shown in the topmost line:' - (the idea of the hexagram) has reached its extreme development.
 
 
-## ䷑蠱 - Gu
+# ䷑蠱 - Gu
 
   
 蠱：元亨，利涉大川。先甲三日，後甲三日。
@@ -1262,7 +1260,7 @@ The sixth NINE, undivided, shows us one who does not serve either king or feudal
 'He does not serve either king or feudal lord:' - but his aim may be a model (to others).
 
 
-## ䷒臨 - Lin
+# ䷒臨 - Lin
 
   
 臨：元，亨，利，貞。至于八月有凶。
@@ -1326,7 +1324,7 @@ The sixth SIX, divided, shows the advance of honesty and generosity. There will 
 'The good fortune consequent on the advance of honesty and generosity' is due to the will (of the subject of the line) being set on the subjects of (the first two lines of) the inner (trigram).
 
 
-## ䷓觀 - Guan
+# ䷓觀 - Guan
 
   
 觀：盥而不薦，有孚顒若。
@@ -1390,7 +1388,7 @@ The sixth NINE, undivided, shows its subject contemplating his character to see 
 'He contemplates his own character:' - he cannot even yet let his mind be at rest.
 
 
-## ䷔噬嗑 - Shi He
+# ䷔噬嗑 - Shi He
 
   
 噬嗑：亨。利用獄。
@@ -1454,7 +1452,7 @@ The sixth NINE, undivided, shows one wearing the cangue, and deprived of his ear
 'He wears the cangue and is deprived of his ears:' - he hears, but will not understand.
 
 
-## ䷕賁 - Bi
+# ䷕賁 - Bi
 
   
 賁：亨。小利有攸往。
@@ -1518,7 +1516,7 @@ The sixth NINE, undivided, shows one with white as his (only) ornament. There wi
 'The freedom from error attached to (the subject of) the topmost line, with no ornament but the (simple white),' shows how he has attained his aim.
 
 
-## ䷖剝 - Bo
+# ䷖剝 - Bo
 
   
 剝：不利有攸往。
@@ -1582,7 +1580,7 @@ The topmost NINE, undivided, shows its subject (as) a great fruit which has not 
 'The superior man finds himself in a carriage:' - he is carried along by the people. 'The small men (by their course) overthrow their own dwellings:' - they can. never again be of use to them.
 
 
-## ䷗復 - Fu
+# ䷗復 - Fu
 
   
 復：亨。出入无疾，朋來无咎。反復其道，七日來復，利有攸往。
@@ -1646,7 +1644,7 @@ The topmost SIX, divided, shows its subject all astray on the subject of returni
 'The evil consequent on being all astray on the subject of returning' is because the course pursued is contrary to the proper course for a ruler.
 
 
-## ䷘无妄 - Wu Wang
+# ䷘无妄 - Wu Wang
 
   
 无妄：元亨，利貞。其匪正有眚，不利有攸往。
@@ -1710,7 +1708,7 @@ The topmost NINE, undivided, shows its subject free from insincerity, yet sure t
 'The action (in this case) of one who is free from insincerity' will occasion the calamity arising from action (when the time for it is) exhausted.
 
 
-## ䷙大畜 - Da Xu
+# ䷙大畜 - Da Xu
 
   
 大畜：利貞，不家食吉，利涉大川。
@@ -1774,7 +1772,7 @@ The sixth NINE, undivided, shows its subject (as) in command of the firmament of
 'In command of the firmament of heaven:' - the way is grandly open for movement.
 
 
-## ䷚頤 - Yi
+# ䷚頤 - Yi
 
   
 頤：貞吉。觀頤，自求口實。
@@ -1838,7 +1836,7 @@ The sixth NINE, undivided, shows him from whom comes the nourishing. His positio
 'The good fortune, notwithstanding the peril of his position, of him from whom comes the nourishing,' affords great cause for congratulation.
 
 
-## ䷛大過 - Da Guo
+# ䷛大過 - Da Guo
 
   
 大過：棟橈，利有攸往，亨。
@@ -1902,7 +1900,7 @@ The topmost SIX, divided, shows its subject with extraordinary (boldness) wading
 'Evil follows wading with (extraordinary) boldness (through the stream):' - but (the act) affords no ground for blame.
 
 
-## ䷜坎 - Kan
+# ䷜坎 - Kan
 
   
 坎：習坎，有孚，維心亨，行有尚。
@@ -1966,7 +1964,7 @@ The topmost SIX, divided, shows its subject bound with cords of three strands or
 'The sixth line, divided, shows its subject missing his (proper) course:' - 'there will be evil for three years.'
 
 
-## ䷝離 - Li
+# ䷝離 - Li
 
   
 離：利貞，亨。畜牝牛，吉。
@@ -2030,7 +2028,7 @@ The topmost NINE, undivided, shows the king employing its subject in his punitiv
 'The king employs him in his punitive expeditions:' - the object is to bring the regions to a correct state.
 
 
-## ䷞咸 - Xian
+# ䷞咸 - Xian
 
   
 咸，亨，利貞，取女吉。
@@ -2094,7 +2092,7 @@ The sixth six, divided, shows one moving his jaws and tongue.
 'He moves his jaws and tongue:' - he (only) talks with loquacious mouth.
 
 
-## ䷟恆 - Heng
+# ䷟恆 - Heng
 
   
 恆：亨，无咎，利貞，利有攸往。
@@ -2158,7 +2156,7 @@ The topmost SIX, divided, shows its subject exciting himself to long continuance
 'The subject of the topmost line is exciting himself to long continuance:' - far will he be from achieving merit.
 
 
-## ䷠遯 - Dun
+# ䷠遯 - Dun
 
   
 遯：亨，小利貞。
@@ -2222,7 +2220,7 @@ The sixth NINE, undivided, shows its subject retiring in a noble way. It will be
 'He retires in a noble way, and his doing so will be advantageous in every respect:' - he who does so has no doubts about his course.
 
 
-## ䷡大壯 - Da Zhuang
+# ䷡大壯 - Da Zhuang
 
   
 大壯：利貞。
@@ -2286,7 +2284,7 @@ The sixth SIX, divided, shows (one who may be compared to) the ram butting again
 'He is unable either to retreat or to advance:' - this is owing to his want of care. 'If he realise the difficulty (of his position), there will be good fortune:' - his error will not be prolonged.
 
 
-## ䷢晉 - Jin
+# ䷢晉 - Jin
 
   
 晉：康侯用錫馬蕃庶，晝日三接。
@@ -2350,7 +2348,7 @@ The topmost NINE, undivided, shows one advancing his horns. But he only uses the
 'He uses his horns only to punish (the rebellious people of) his city:' - his course of procedure is not yet brilliant.
 
 
-## ䷣明夷 - Ming Yi
+# ䷣明夷 - Ming Yi
 
   
 明夷：利艱貞。
@@ -2414,7 +2412,7 @@ The sixth six, divided, shows the case where there is no light, but (only) obscu
 'He had at first ascended to (the top of) the sky:' - he might have enlightened the four quarters of the kingdom. 'His future shall be to go into the earth:' - he has failed to fulfil the model (of a ruler).
 
 
-## ䷤家人 - Jia Ren
+# ䷤家人 - Jia Ren
 
   
 家人：利女貞。
@@ -2478,7 +2476,7 @@ The topmost NINE, undivided, shows its subject possessed of sincerity and arraye
 'The good fortune connected with the display of majesty' describes (the result of) the recovery of the true character.
 
 
-## ䷥睽 - Kui
+# ䷥睽 - Kui
 
   
 睽：小事吉。
@@ -2542,7 +2540,7 @@ The topmost NINE, undivided, shows its subject solitary amidst the (prevailing) 
 'The good fortune symbolised by meeting with (genial) rain' springs from the passing away of all doubts.
 
 
-## ䷦蹇 - Jian
+# ䷦蹇 - Jian
 
   
 蹇：利西南，不利東北；利見大人，貞吉。
@@ -2606,7 +2604,7 @@ The topmost SIX, divided, shows its subject going forward, (only to increase) th
 'To advance will (only) increase the difficulties, while his remaining stationary will (be productive of) great (merit):' - his aim is to assist the (subject of the line) inside of him. 'It will be advantageous to meet the great man:' - by his course he follows that noble (lord of the figure).
 
 
-## ䷧解 - Jie
+# ䷧解 - Jie
 
   
 解：利西南，无所往，其來復吉。有攸往，夙吉。
@@ -2670,7 +2668,7 @@ In the sixth SIX, divided, we see a feudal prince (with his bow) shooting at a f
 'A prince with his bow shoots a falcon:' - thus he removes (the promoters of) rebellion.
 
 
-## ䷨損 - Sun
+# ䷨損 - Sun
 
   
 損：有孚，元吉，无咎，可貞，利有攸往。曷之用，二簋可用享。
@@ -2734,7 +2732,7 @@ The topmost NINE, undivided, shows its subject giving increase to others without
 'He gives increase to others without taking from what is his own:' - he obtains his wish on a grand scale.
 
 
-## ䷩益 - Yi
+# ䷩益 - Yi
 
   
 益：利有攸往，利涉大川。
@@ -2798,7 +2796,7 @@ In the sixth NINE, undivided, we see one to whose increase none will contribute,
 'To his increase none will contribute:' - this expresses but half the result. 'Many will seek to assail him:' - they will come from beyond (his immediate circle) to do so.
 
 
-## ䷪夬 - Guai
+# ䷪夬 - Guai
 
   
 夬：揚于王庭，孚號，有厲，告自邑，不利即戎，利有攸往。
@@ -2862,7 +2860,7 @@ The sixth SIX, divided, shows its subject without any (helpers) on whom to call.
 'There is the misery of having none on whom to call:' - the end will be that he cannot continue any longer.
 
 
-## ䷫姤 - Gou
+# ䷫姤 - Gou
 
   
 姤：女壯，勿用取女。
@@ -2926,7 +2924,7 @@ The sixth NINE, undivided, shows its subject receiving others on his horns. Ther
 'He receives others on his horns:' - he is exhausted at his greatest height, and there will be cause for regret.
 
 
-## ䷬萃 - Cui
+# ䷬萃 - Cui
 
   
 萃：亨。王假有廟，利見大人，亨，利貞。用大牲吉，利有攸往。
@@ -2990,7 +2988,7 @@ The topmost SIX, divided, shows its subject sighing and weeping; but there will 
 'He sighs and weeps:' - he does not yet rest in his topmost position.
 
 
-## ䷭升 - Sheng
+# ䷭升 - Sheng
 
   
 升：元亨，用見大人，勿恤，南征吉。
@@ -3054,7 +3052,7 @@ The sixth six, divided, shows its subject advancing upwards blindly. Advantage w
 'He blindly advances upwards,' and is in the highest place: - but there is decay in store for him, and he will not (preserve) his riches.
 
 
-## ䷮困 - Kun
+# ䷮困 - Kun
 
   
 困：亨，貞，大人吉，无咎，有言不信。
@@ -3118,7 +3116,7 @@ The sixth SIX, divided, shows its subject straitened, as if bound with creepers;
 'He is straitened as if bound with creepers: (his spirit and action) are unsuitable. '(He says), "If I move, I shall repent of it." And he does repent (of former errors), which leads to good fortune:' - so he (now) goes on.
 
 
-## ䷯井 - Jing
+# ䷯井 - Jing
 
   
 井：改邑不改井，无喪无得，往來井井。汔至，亦未繘井，羸其瓶，凶。
@@ -3182,7 +3180,7 @@ The topmost SIX, divided, shows (the water from) the well brought to the top, wh
 'The great good fortune' at the topmost place indicates the grand accomplishment (of the idea in the hexagram).
 
 
-## ䷰革 - Ge
+# ䷰革 - Ge
 
   
 革：巳日乃孚，元亨利貞，悔亡。
@@ -3246,7 +3244,7 @@ The sixth SIX, divided, shows the superior man producing his changes as the leop
 'The superior man produces his changes as the leopard does when he changes his spots:' - their beauty becomes more elegant. 'Small men change their faces:' - they show themselves prepared to follow their ruler.
 
 
-## ䷱鼎 - Ding
+# ䷱鼎 - Ding
 
   
 鼎：元吉，亨。
@@ -3310,7 +3308,7 @@ The sixth NINE, undivided, shows the caldron with rings of jade. There will be g
 'The rings of jade' are at the very top: - the strong and the weak meet in their due proportions.
 
 
-## ䷲震 - Zhen
+# ䷲震 - Zhen
 
   
 震：亨。震來虩虩，笑言啞啞。震驚百里，不喪匕鬯。
@@ -3374,7 +3372,7 @@ The topmost SIX, divided, shows its subject, amidst the startling movements (of 
 'Amid the startling movements he is in breathless dismay:' - he has not found out (the course of) the due mean. 'Though evil (threatens), he will not fall into error:' - he is afraid of being warned by his neighbours. 
 
 
-## ䷳艮 - Gen
+# ䷳艮 - Gen
 
   
 艮：艮其背，不獲其身，行其庭，不見其人，无咎。
@@ -3438,7 +3436,7 @@ The sixth NINE, undivided, shows its subject devotedly maintaining his restfulne
 'There is good fortune through his devotedly maintaining his restfulness:' - to the end he shows himself generous and good.
 
 
-## ䷴漸 - Jian
+# ䷴漸 - Jian
 
   
 漸：女歸吉，利貞。
@@ -3502,7 +3500,7 @@ The sixth NINE, undivided, shows the geese gradually advanced to the large heigh
 'Their feathers can be used as ornaments. There will be good fortune:' - (the object and character of the subject of the line) cannot be disturbed.
 
 
-## ䷵歸妹 - Gui Mei
+# ䷵歸妹 - Gui Mei
 
   
 歸妹：征凶，无攸利。
@@ -3566,7 +3564,7 @@ The sixth SIX, divided, shows the young lady bearing the basket, but without any
 '(What is said in) the sixth SIX, (divided),about there being nothing in the basket' shows that the subject of it is carrying an empty basket.
 
 
-## ䷽小過 - Xiao Guo
+# ䷽小過 - Xiao Guo
 
   
 小過：亨，利貞，可小事，不可大事。飛鳥遺之音，不宜上，宜下，大吉。
